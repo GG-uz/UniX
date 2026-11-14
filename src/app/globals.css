@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* ========================================================
+   UNISPORT LEAGUE – Global Design System
+   Dark-first theme: neutral-950 base, amber-500 accent
+   ======================================================== */
+
+:root {
+  --background: #09090b;         /* neutral-950 */
+  --foreground: #fafafa;         /* neutral-50 */
+  --accent:     #f59e0b;         /* amber-500 */
+  --accent-glow: rgba(245,158,11,0.25);
+  --card:       #18181b;         /* neutral-900 */
+  --border:     #27272a;         /* neutral-800 */
+  --muted:      #71717a;         /* neutral-500 */
+  --success:    #22c55e;
+  --warning:    #f59e0b;
+  --danger:     #ef4444;
+}
+
+/* Force dark background on html + body */
+html {
+  color-scheme: dark;
+  background-color: var(--background);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* ── Scrollbar styling ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+*::-webkit-scrollbar        { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track  { background: transparent; }
+*::-webkit-scrollbar-thumb  { background: #3f3f46; border-radius: 999px; }
+
+/* ── Selection ── */
+::selection {
+  background-color: var(--accent);
+  color: #000;
+}
+
+/* ── Smooth scroll ── */
+html { scroll-behavior: smooth; }
+
+/* ── Animate-in utility (Tailwind 4 adds this natively, polyfill here) ── */
+@keyframes fade-in         { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoom-in-95      { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes slide-in-bottom { from { transform: translateY(1.25rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.animate-in { animation-fill-mode: both; animation-duration: 200ms; }
+.fade-in            { animation-name: fade-in; }
+.zoom-in-95         { animation-name: zoom-in-95; }
+.slide-in-from-bottom-5 { animation-name: slide-in-bottom; }
+
+/* ── Status badge helpers ── */
+.badge-open     { @apply bg-emerald-500/10 border border-emerald-500/30 text-emerald-400; }
+.badge-booked   { @apply bg-blue-500/10 border border-blue-500/30 text-blue-400; }
+.badge-disputed { @apply bg-red-500/10 border border-red-500/30 text-red-400; }
+.badge-featured { @apply bg-amber-500/10 border border-amber-500/30 text-amber-400; }

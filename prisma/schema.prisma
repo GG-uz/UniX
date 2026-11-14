@@ -1,0 +1,135 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  STUDENT_CAPTAIN
+  VENUE_MANAGER
+  SUPER_ADMIN
+}
+
+enum SportType {
+  FOOTBALL
+  BASKETBALL
+  VOLLEYBALL
+}
+
+enum MatchStatus {
+  OPEN
+  BOOKED
+  COMPLETED
+  DISPUTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID_FULL
+  PAID_SPLIT
+  REFUNDED
+  FORFEITED
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  fullName        String
+  role            UserRole       @default(STUDENT_CAPTAIN)
+  universityName  String?
+  avatarUrl       String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  captainedTeams  Team[]         @relation("TeamCaptain")
+  managedVenues   Venue[]        @relation("VenueManager")
+  bookings        Booking[]
+}
+
+model Team {
+  id              String         @id @default(uuid())
+  name            String
+  sportType       SportType
+  captainId       String
+  captain         User           @relation("TeamCaptain", fields: [captainId], references: [id])
+  universityName  String
+  logoUrl         String?
+  matchesWon      Int            @default(0)
+  matchesLost     Int            @default(0)
+  matchesDrawn    Int            @default(0)
+  totalPoints     Int            @default(0)
+  createdAt       DateTime       @default(now())
+
+  challengerMatches Match[]      @relation("ChallengerTeam")
+  opponentMatches   Match[]      @relation("OpponentTeam")
+}
+
+model Venue {
+  id                String       @id @default(uuid())
+  name              String
+  managerId         String
+  manager           User         @relation("VenueManager", fields: [managerId], references: [id])
+  address           String
+  city              String       @default("Moscow")
+  hourlyRate        Decimal      @db.Decimal(10, 2)
+  sportTypes        SportType[]
+  surfaceType       String
+  isFeatured        Boolean      @default(false)
+  imageUrl          String?
+  rating            Decimal      @default(4.8) @db.Decimal(3, 2)
+  cancellationHours Int          @default(48)
+  createdAt         DateTime     @default(now())
+
+  slots             Slot[]
+  matches           Match[]
+}
+
+model Slot {
+  id              String         @id @default(uuid())
+  venueId         String
+  venue           Venue          @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  startTime       DateTime
+  endTime         DateTime
+  isBooked        Boolean        @default(false)
+  price           Decimal        @db.Decimal(10, 2)
+
+  matches         Match[]
+}
+
+model Match {
+  id                String       @id @default(uuid())
+  sportType         SportType
+  challengerTeamId  String
+  challengerTeam    Team         @relation("ChallengerTeam", fields: [challengerTeamId], references: [id])
+  opponentTeamId    String?
+  opponentTeam      Team?        @relation("OpponentTeam", fields: [opponentTeamId], references: [id])
+  venueId           String
+  venue             Venue        @relation(fields: [venueId], references: [id])
+  slotId            String
+  slot              Slot         @relation(fields: [slotId], references: [id])
+  status            MatchStatus  @default(OPEN)
+  scoreTeam1        Int?
+  scoreTeam2        Int?
+  scheduledDate     DateTime
+  description       String?
+  createdAt         DateTime     @default(now())
+
+  booking           Booking?
+}
+
+model Booking {
+  id                   String        @id @default(uuid())
+  matchId              String        @unique
+  match                Match         @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  userId               String
+  user                 User          @relation(fields: [userId], references: [id])
+  amountPaid           Decimal       @db.Decimal(10, 2)
+  paymentStatus        PaymentStatus @default(PENDING)
+  cancellationDeadline DateTime      // Strict 48h limit (slot.startTime - 48h)
+  isSplitPayment       Boolean       @default(false)
+  stripePaymentId      String?
+  createdAt            DateTime      @default(now())
+}
