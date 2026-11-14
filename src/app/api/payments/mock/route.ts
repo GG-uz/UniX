@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { amount, currency = 'USD', description, metadata } = body;
+    const { amount, currency = 'UZS', description, metadata } = body;
 
     if (!amount || amount <= 0) {
       return NextResponse.json({ success: false, error: 'Invalid amount' }, { status: 400 });

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useAppState } from '@/context/AppStateContext';
 import { Sparkles, Star, MapPin, CheckCircle, ArrowRight, Shield } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getDisciplineLabel } from '@/lib/utils';
 
 export const FeaturedVenues: React.FC = () => {
   const { venues } = useAppState();
@@ -15,22 +15,22 @@ export const FeaturedVenues: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              Priority Paid Partners
+              Приоритетные Площадки &amp; Хабы
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Featured Arenas &amp; Stadiums
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              Рекомендуемые Локации для Битв
             </h2>
             <p className="text-sm text-neutral-400 mt-1">
-              Top-tier sports facilities with guaranteed heating, professional referee booths, and instant time-slot booking.
+              Кампус TEAM University, профессиональные футбольные комплексы и IT-арены Ташкента (ставка до 300 000 сум/час).
             </p>
           </div>
           <Link
             href="/venues"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
           >
-            Explore all {venues.length} venues <ArrowRight className="w-4 h-4" />
+            Все {venues.length} площадки <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -54,73 +54,80 @@ export const FeaturedVenues: React.FC = () => {
                   {/* Priority Sponsored Badge */}
                   <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs uppercase tracking-wider shadow-lg">
                     <Sparkles className="w-3.5 h-3.5 text-neutral-950" />
-                    Featured Partner
+                    Featured Партнер
                   </div>
 
                   {/* Rating Badge */}
-                  <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-950/80 backdrop-blur-md border border-neutral-700 text-xs font-bold text-white">
+                  <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-neutral-700 text-xs text-white font-bold">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     <span>{venue.rating}</span>
-                    <span className="text-neutral-400">({venue.reviewCount})</span>
+                    <span className="text-neutral-400 text-[10px]">({venue.reviewCount})</span>
                   </div>
 
-                  {/* Surface Tag */}
-                  <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                    <span className="text-xs font-medium text-neutral-300 bg-neutral-900/90 backdrop-blur-md px-2.5 py-1 rounded-md border border-neutral-700">
-                      {venue.surfaceType}
-                    </span>
-                    <span className="text-xs font-bold text-emerald-400 bg-emerald-950/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-emerald-800">
-                      {availableSlots} slots open
-                    </span>
+                  {/* Surface and Price pill */}
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
+                        {venue.surfaceType}
+                      </span>
+                      <h3 className="text-lg font-black text-white">{venue.name}</h3>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs text-neutral-400 block">Аренда</span>
+                      <span className="text-base font-black text-amber-400">
+                        {formatCurrency(venue.hourlyRate)}
+                      </span>
+                      <span className="text-[11px] text-neutral-400">/час</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Card Content */}
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
-                          {venue.name}
-                        </h3>
-                        <div className="flex items-center gap-1.5 text-xs text-neutral-400 mt-1">
-                          <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                          <span>{venue.address}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-black text-white">{formatCurrency(venue.hourlyRate)}</div>
-                        <div className="text-[11px] text-neutral-400 uppercase font-semibold">per hour</div>
-                      </div>
+                {/* Details Bottom Bar */}
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                      <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>{venue.address}</span>
                     </div>
 
-                    {/* Amenities Pill List */}
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {venue.amenities.map((item, idx) => (
+                    {/* Discipline Pills */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {venue.sportTypes.map((sp) => (
                         <span
-                          key={idx}
-                          className="inline-flex items-center gap-1 text-[11px] font-medium text-neutral-300 bg-neutral-800/80 px-2 py-0.5 rounded-md border border-neutral-700/60"
+                          key={sp}
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-800 text-neutral-300 border border-neutral-700"
                         >
-                          <CheckCircle className="w-3 h-3 text-amber-400" />
-                          {item}
+                          {getDisciplineLabel(sp)}
                         </span>
+                      ))}
+                    </div>
+
+                    {/* Amenities Checklist */}
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-neutral-400 pt-1">
+                      {venue.amenities.slice(0, 4).map((am) => (
+                        <div key={am} className="flex items-center gap-1.5">
+                          <CheckCircle className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span className="truncate">{am}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* 48-Hour Cancellation Guarantee & CTA */}
-                  <div className="mt-6 pt-4 border-t border-neutral-800/80 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs text-neutral-400">
-                      <Shield className="w-3.5 h-3.5 text-amber-500" />
-                      <span>48-hr full refund guarantee</span>
+                  {/* Action CTA */}
+                  <div className="pt-4 border-t border-neutral-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-emerald-400" />
+                      <span className="text-xs text-neutral-300">
+                        Свободных слотов:{' '}
+                        <strong className="text-white font-bold">{availableSlots}</strong>
+                      </span>
                     </div>
 
                     <Link
                       href={`/venues/${venue.id}`}
-                      className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all hover:gap-2"
+                      className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-amber-500 hover:text-neutral-950 font-bold text-xs text-white border border-neutral-700 transition-all active:scale-95 flex items-center gap-1.5"
                     >
-                      <span>Pick Time Slot</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      Забронировать слот <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>

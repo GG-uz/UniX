@@ -7,9 +7,9 @@ import { Footer } from '@/components/layout/Footer';
 import { ToastBanner } from '@/components/ui/ToastBanner';
 
 export const metadata: Metadata = {
-  title: 'UniSport League | Inter-University Matchmaking & Venue Booking',
+  title: 'UniSport & Academic League Tashkent | Матчмейкинг и Бронирование Площадок',
   description:
-    'Challenge rival university teams in Football, Basketball, and Volleyball. Book certified sports arenas with instant slot prepayment & automatic leaderboards.',
+    'Межуниверситетские битвы в Футболе, Математике, Физике, Химии и IT-Хакатонах среди вузов Ташкента (TEAM University, WIUT, Inha, MDIST, Amity, ТУИТ). Бронирование слотов до 300 000 сум/час с защитой 48 часов.',
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="ru" className="dark">
       <body className="min-h-screen bg-neutral-950 text-neutral-100 antialiased flex flex-col font-sans selection:bg-amber-500 selection:text-black">
         <AppStateProvider>
           <Suspense fallback={<div className="h-16 bg-neutral-950 border-b border-neutral-800" />}>

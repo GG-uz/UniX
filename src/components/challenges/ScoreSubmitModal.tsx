@@ -35,8 +35,8 @@ export const ScoreSubmitModal: React.FC<ScoreSubmitModalProps> = ({
     score1 > score2
       ? match.challengerTeam.name
       : score2 > score1
-      ? match.opponentTeam?.name ?? 'Opponent'
-      : 'Draw';
+      ? match.opponentTeam?.name ?? 'Соперник'
+      : 'Ничья';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -48,15 +48,15 @@ export const ScoreSubmitModal: React.FC<ScoreSubmitModalProps> = ({
               <Trophy className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Submit Final Match Score</h3>
+              <h3 className="text-base font-black text-white">Внести Финальный Счет</h3>
               <p className="text-xs text-neutral-400">
-                {formatDate(match.scheduledDate)} · {formatTime(match.scheduledDate)}
+                {formatDate(match.scheduledDate)} в {formatTime(match.scheduledDate)}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800"
+            className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800"
           >
             <X className="w-5 h-5" />
           </button>
@@ -69,7 +69,7 @@ export const ScoreSubmitModal: React.FC<ScoreSubmitModalProps> = ({
             <div className="col-span-5 text-center">
               <div className="text-3xl mb-1">{match.challengerTeam.logoUrl}</div>
               <div className="text-xs font-bold text-white truncate">{match.challengerTeam.name}</div>
-              <div className="text-[11px] text-neutral-400">{match.challengerTeam.universityName}</div>
+              <div className="text-[11px] text-amber-400 font-semibold">{match.challengerTeam.universityName}</div>
               <input
                 type="number"
                 min={0}
@@ -81,15 +81,15 @@ export const ScoreSubmitModal: React.FC<ScoreSubmitModalProps> = ({
             </div>
 
             {/* VS */}
-            <div className="col-span-1 text-center text-xs font-black text-neutral-600">VS</div>
+            <div className="col-span-1 text-center text-xs font-black text-neutral-600">:</div>
 
             {/* Opponent */}
             <div className="col-span-5 text-center">
               <div className="text-3xl mb-1">{match.opponentTeam?.logoUrl ?? '🛡️'}</div>
               <div className="text-xs font-bold text-white truncate">
-                {match.opponentTeam?.name ?? 'Opponent'}
+                {match.opponentTeam?.name ?? 'Соперник'}
               </div>
-              <div className="text-[11px] text-neutral-400">{match.opponentTeam?.universityName ?? ''}</div>
+              <div className="text-[11px] text-amber-400 font-semibold">{match.opponentTeam?.universityName ?? ''}</div>
               <input
                 type="number"
                 min={0}
@@ -106,28 +106,26 @@ export const ScoreSubmitModal: React.FC<ScoreSubmitModalProps> = ({
             <div className="p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-center">
               <Flame className="w-4 h-4 text-emerald-400 inline mr-1.5" />
               <span className="text-emerald-300 font-bold">
-                {winner} wins {score1} – {score2}!
+                {winner} побеждает {score1} : {score2}!
               </span>
             </div>
           )}
           {score1 === score2 && score1 > 0 && (
-            <div className="p-3.5 rounded-2xl bg-neutral-800/60 border border-neutral-700 text-xs text-center text-neutral-300 font-semibold">
-              Match drawn {score1} – {score2}
+            <div className="p-3.5 rounded-2xl bg-neutral-800/60 border border-neutral-700 text-xs text-center text-neutral-300 font-bold">
+              Боевая ничья {score1} : {score2}
             </div>
           )}
 
           {/* Fairplay Warning */}
-          <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 flex gap-2 text-[11px] text-neutral-300">
+          <div className="p-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 flex gap-2 text-[11px] text-neutral-300">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <span>
-              Score submissions are <strong className="text-white">final and binding</strong>. Disputed
-              scores are escalated to the Super Admin for review. Intentionally false submissions
-              may result in team suspension.
+              Счет фиксируется в официальной таблице Лиги. В случае разногласий результат проверяется Супер-Администратором.
             </span>
           </div>
 
           {/* Agree Checkbox */}
-          <label className="flex items-start gap-2 cursor-pointer">
+          <label className="flex items-start gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={agreed}
@@ -135,21 +133,21 @@ export const ScoreSubmitModal: React.FC<ScoreSubmitModalProps> = ({
               className="mt-0.5 accent-amber-500 w-4 h-4 rounded cursor-pointer"
             />
             <span className="text-[11px] text-neutral-300">
-              I confirm this score is accurate and submitted with both captains' agreement.
+              Подтверждаю, что счет согласован обоими капитанами.
             </span>
           </label>
 
           <button
             type="submit"
             disabled={!agreed}
-            className={`w-full py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+            className={`w-full py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
               agreed
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20 active:scale-95 cursor-pointer'
                 : 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700'
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
-            Submit Final Score
+            Зафиксировать Счет Матча
           </button>
         </form>
       </div>

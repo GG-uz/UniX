@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Venue, Slot, SportType } from '@/types';
+import { Venue, Slot, SportType, DISCIPLINE_LIST } from '@/types';
 import {
   AlertTriangle,
   Clock,
@@ -12,17 +12,17 @@ import {
   CheckCircle2,
   Users,
 } from 'lucide-react';
-import { formatCurrency, formatDate, formatTime } from '@/lib/utils';
+import { formatCurrency, formatDate, formatTime, getDisciplineLabel } from '@/lib/utils';
 
 interface CancellationModalProps {
   isOpen: boolean;
   onClose: () => void;
   venue: Venue;
   slot: Slot;
-  onConfirmBooking: (params: {
+  onConfirm: (params: {
     sportType: SportType;
     isSplitPayment: boolean;
-    paymentMethod: 'STRIPE' | 'SBP' | 'CARD';
+    paymentMethod: 'UZUM' | 'PAYME' | 'CLICK' | 'STRIPE';
     matchDescription: string;
   }) => void;
 }
@@ -32,11 +32,11 @@ export const CancellationModal: React.FC<CancellationModalProps> = ({
   onClose,
   venue,
   slot,
-  onConfirmBooking,
+  onConfirm,
 }) => {
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
-  const [isSplit, setIsSplit] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'STRIPE' | 'SBP' | 'CARD'>('STRIPE');
+  const [isSplit, setIsSplit] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState<'UZUM' | 'PAYME' | 'CLICK' | 'STRIPE'>('PAYME');
   const [sportType, setSportType] = useState<SportType>(venue.sportTypes[0] || 'FOOTBALL');
   const [description, setDescription] = useState('');
 
@@ -52,7 +52,7 @@ export const CancellationModal: React.FC<CancellationModalProps> = ({
     e.preventDefault();
     if (!agreedToPolicy) return;
 
-    onConfirmBooking({
+    onConfirm({
       sportType,
       isSplitPayment: isSplit,
       paymentMethod,
@@ -62,204 +62,195 @@ export const CancellationModal: React.FC<CancellationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl rounded-3xl bg-neutral-900 border border-neutral-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-lg rounded-3xl bg-neutral-900 border border-neutral-800 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="p-5 border-b border-neutral-800 bg-neutral-950/70 flex items-center justify-between">
+        <div className="p-5 border-b border-neutral-800 bg-neutral-950/70 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
-              <Lock className="w-5 h-5" />
+              <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Confirm Booking &amp; Secure Slot</h3>
-              <p className="text-xs text-neutral-400">{venue.name} • {slot.id}</p>
+              <h3 className="text-base font-black text-white">Бронирование &amp; Правило 48 Часов</h3>
+              <p className="text-xs text-neutral-400 truncate max-w-xs">{venue.name}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+            className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Scrollable Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm">
-          {/* Slot Summary Card */}
-          <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-neutral-400">Scheduled Kickoff:</span>
-              <span className="font-bold text-white">
-                {formatDate(slot.startTime)} • {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+        {/* Scrollable Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 text-sm flex-1">
+          {/* Slot Summary */}
+          <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Выбранное время слота
+              </span>
+              <div className="text-sm font-bold text-white mt-0.5">
+                {formatDate(slot.startTime)} • {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+              </div>
+              <div className="text-xs text-neutral-400 mt-0.5">{venue.surfaceType}</div>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Полный тариф
+              </span>
+              <span className="text-base font-black text-amber-400">
+                {formatCurrency(totalAmount)}
               </span>
             </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-neutral-400">Total Slot Cost:</span>
-              <span className="font-bold text-amber-400">{formatCurrency(totalAmount)}</span>
-            </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-neutral-400">Arena Address:</span>
-              <span className="text-neutral-300 truncate max-w-[250px]">{venue.address}</span>
-            </div>
           </div>
 
-          {/* Sport Discipline Picker */}
+          {/* Discipline Picker */}
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase mb-1.5">
-              Match Discipline
+            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+              Дисциплина встречи
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <select
+              value={sportType}
+              onChange={(e) => setSportType(e.target.value as SportType)}
+              className="w-full p-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-white focus:outline-none focus:border-amber-500 cursor-pointer"
+            >
               {venue.sportTypes.map((sp) => (
-                <button
-                  key={sp}
-                  type="button"
-                  onClick={() => setSportType(sp)}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition-colors ${
-                    sportType === sp
-                      ? 'bg-amber-500 text-neutral-950 border-amber-500'
-                      : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
-                  }`}
-                >
-                  {sp}
-                </button>
+                <option key={sp} value={sp}>
+                  {getDisciplineLabel(sp)}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
 
-          {/* Match Note / Open Challenge description */}
+          {/* Match Description */}
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase mb-1.5">
-              Match Note or Challenge Callout
+            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-1.5">
+              Описание матча / Тема вызова
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g., HSE Eagles 7x7 looking for rival team. Fast pace, bibs provided."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-500"
+              placeholder="Например: TEAM University ищет соперника на дерби 5х5 или олимпиадный матбой..."
+              className="w-full p-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-500 transition-colors"
             />
           </div>
 
-          {/* Prepayment Split Option */}
-          <div className="p-4 rounded-2xl bg-neutral-950/90 border border-neutral-800 space-y-3">
+          {/* Split Payment Toggle */}
+          <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-3">
             <span className="text-xs font-bold text-white uppercase tracking-wider block">
-              Payment Model
+              Схема оплаты аренды
             </span>
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => setIsSplit(false)}
-                className={`p-3 rounded-xl border text-left transition-all ${
-                  !isSplit
-                    ? 'border-amber-500 bg-amber-500/10 text-white'
-                    : 'border-neutral-800 bg-neutral-950 text-neutral-400 hover:text-white'
-                }`}
-              >
-                <div className="font-bold text-xs">Full Prepayment</div>
-                <div className="text-[11px] text-neutral-400 mt-0.5">Pay 100% ({formatCurrency(totalAmount)})</div>
-              </button>
-
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setIsSplit(true)}
                 className={`p-3 rounded-xl border text-left transition-all ${
                   isSplit
-                    ? 'border-amber-500 bg-amber-500/10 text-white'
-                    : 'border-neutral-800 bg-neutral-950 text-neutral-400 hover:text-white'
+                    ? 'bg-amber-500/15 border-amber-500/60 text-white shadow-sm'
+                    : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
                 }`}
               >
-                <div className="font-bold text-xs flex items-center gap-1">
-                  <Users className="w-3 h-3 text-amber-400" />
-                  Split 50 / 50
+                <div className="flex items-center gap-1.5 font-bold text-xs">
+                  <Users className="w-3.5 h-3.5 text-amber-400" /> 50/50 Сплит
                 </div>
-                <div className="text-[11px] text-neutral-400 mt-0.5">Pay 50% now ({formatCurrency(totalAmount / 2)})</div>
+                <div className="text-[11px] text-neutral-400 mt-1">
+                  Вы платите: <strong className="text-amber-400">{formatCurrency(totalAmount / 2)}</strong>. Соперник доплатит свою часть при принятии.
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsSplit(false)}
+                className={`p-3 rounded-xl border text-left transition-all ${
+                  !isSplit
+                    ? 'bg-amber-500/15 border-amber-500/60 text-white shadow-sm'
+                    : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 font-bold text-xs">
+                  <CreditCard className="w-3.5 h-3.5 text-amber-400" /> 100% Предоплата
+                </div>
+                <div className="text-[11px] text-neutral-400 mt-1">
+                  Полная бронь слота: <strong className="text-amber-400">{formatCurrency(totalAmount)}</strong>.
+                </div>
               </button>
             </div>
-            {isSplit && (
-              <p className="text-[11px] text-neutral-400 italic">
-                * Your team pays $ {totalAmount / 2} now to hold the reservation. When an opponent accepts your challenge, their team pays the remaining $ {totalAmount / 2}.
-              </p>
-            )}
           </div>
 
-          {/* Mock Stripe / Payment Gateway Selection */}
+          {/* Strict 48H Cancellation Rule Box */}
+          <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-500/40 text-xs space-y-2">
+            <div className="flex items-center gap-2 text-amber-400 font-bold">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>Строгая Политика Отмены (Дедлайн: 48 часов)</span>
+            </div>
+            <p className="text-neutral-300 leading-relaxed text-[11px]">
+              Крайний срок бесплатной отмены:
+            </p>
+            <div className="p-2.5 rounded-xl bg-neutral-950 border border-amber-500/30 text-center font-black text-amber-300 text-xs">
+              до {formatDate(cancellationDeadline.toISOString())} в {formatTime(cancellationDeadline.toISOString())}
+            </div>
+            <ul className="space-y-1.5 text-[11px] text-neutral-400 pt-1">
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>Более 48ч до игры:</strong> 100% возврат средств на ваш счет.</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
+                <span><strong>Менее 48ч до игры:</strong> Депозит полностью сгорает и перечисляется площадке за простой.</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Payment Method Selector */}
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase mb-1.5">
-              Select Payment Gateway
+            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+              Способ оплаты
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'STRIPE', label: 'Stripe Pay' },
-                { id: 'CARD', label: 'Credit Card' },
-                { id: 'SBP', label: 'SBP Fast Pay' },
-              ].map((p) => (
+            <div className="grid grid-cols-4 gap-2">
+              {(['PAYME', 'CLICK', 'UZUM', 'STRIPE'] as const).map((method) => (
                 <button
-                  key={p.id}
+                  key={method}
                   type="button"
-                  onClick={() => setPaymentMethod(p.id as any)}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 transition-colors ${
-                    paymentMethod === p.id
-                      ? 'border-amber-500 bg-amber-500/10 text-white'
-                      : 'border-neutral-800 bg-neutral-950 text-neutral-400 hover:text-white'
+                  onClick={() => setPaymentMethod(method)}
+                  className={`py-2 px-1 text-center rounded-xl text-xs font-bold border transition-all ${
+                    paymentMethod === method
+                      ? 'bg-amber-500 text-neutral-950 border-amber-400 font-black shadow-md'
+                      : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
                   }`}
                 >
-                  <CreditCard className="w-3.5 h-3.5 text-amber-400" />
-                  {p.label}
+                  {method === 'UZUM' ? 'Uzum Bank' : method}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* STRICT 48-HOUR CANCELLATION POLICY WARNING CARD */}
-          <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-500/40 space-y-2.5">
-            <div className="flex items-start gap-2.5">
-              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wide">
-                  Strict 48-Hour Cancellation Rule
-                </h4>
-                <p className="text-[11px] text-neutral-300 leading-relaxed mt-1">
-                  To protect venue owners and prevent last-minute no-shows, any booking cancellation made{' '}
-                  <strong className="text-white">within 48 hours</strong> of game kickoff will{' '}
-                  <strong className="text-red-400 underline">forfeit the full deposit</strong>.
-                </p>
-              </div>
-            </div>
+          {/* Mandatory Checkbox Agreement */}
+          <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-neutral-950 border border-neutral-800 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={agreedToPolicy}
+              onChange={(e) => setAgreedToPolicy(e.target.checked)}
+              className="accent-amber-500 w-4 h-4 rounded mt-0.5 cursor-pointer"
+            />
+            <span className="text-[11px] text-neutral-300 leading-tight">
+              Я ознакомился и согласен с <strong className="text-white">Политикой 48 часов</strong>. Я понимаю, что при отмене менее чем за 48 часов до матча мой депозит не возвращается.
+            </span>
+          </label>
 
-            <div className="bg-neutral-950/80 p-2.5 rounded-xl border border-neutral-800 text-[11px] flex justify-between items-center text-neutral-300">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-amber-400" /> Free Cancellation Deadline:
-              </span>
-              <span className="font-bold text-amber-300">
-                {formatDate(cancellationDeadline.toISOString())} at {formatTime(cancellationDeadline.toISOString())}
-              </span>
-            </div>
-
-            {/* Checkbox acknowledgement */}
-            <label className="flex items-start gap-2 pt-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreedToPolicy}
-                onChange={(e) => setAgreedToPolicy(e.target.checked)}
-                className="mt-0.5 accent-amber-500 w-4 h-4 rounded cursor-pointer"
-              />
-              <span className="text-[11px] text-neutral-300 font-medium">
-                I understand and agree to the 48-hour cancellation policy. If my team cancels after the deadline, our deposit is transferred to the venue.
-              </span>
-            </label>
-          </div>
-
-          {/* Submit CTA */}
+          {/* Submit Action */}
           <button
             type="submit"
             disabled={!agreedToPolicy}
-            className={`w-full py-3.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all ${
+            className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition-all ${
               agreedToPolicy
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-neutral-950 shadow-amber-500/20 active:scale-95 cursor-pointer'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 hover:from-amber-400 hover:to-orange-400 active:scale-95 cursor-pointer shadow-orange-500/20'
                 : 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700'
             }`}
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Pay &amp; Lock Slot ({formatCurrency(payNowAmount)})</span>
+            <Lock className="w-3.5 h-3.5" />
+            Оплатить {formatCurrency(payNowAmount)} &amp; Зафиксировать Слот
           </button>
         </form>
       </div>

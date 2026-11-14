@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Team, Venue, Match, Slot, UserRole, SportType } from '@/types';
 import { MOCK_USERS, MOCK_TEAMS, MOCK_VENUES, MOCK_MATCHES } from '@/lib/mockData';
+import { formatCurrency } from '@/lib/utils';
 
 interface BookingConfirmationParams {
   venueId: string;
@@ -12,7 +13,7 @@ interface BookingConfirmationParams {
   opponentTeamId?: string;
   matchDescription?: string;
   isSplitPayment: boolean;
-  paymentMethod: 'STRIPE' | 'SBP' | 'CARD';
+  paymentMethod: 'UZUM' | 'PAYME' | 'CLICK' | 'STRIPE';
 }
 
 interface AppStateContextType {
@@ -36,6 +37,8 @@ interface AppStateContextType {
   disputeMatch: (matchId: string) => { success: boolean; error?: string };
   approveVenue: (venueId: string) => { success: boolean };
   suspendTeam: (teamId: string) => { success: boolean };
+  theme: 'dark' | 'light';
+  toggleTheme: () => void;
   toastMessage: string | null;
   clearToast: () => void;
   showToast: (msg: string) => void;
@@ -44,11 +47,12 @@ interface AppStateContextType {
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
 
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]); // Alexey, Captain
+  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]); // Сардор Рахимов, TEAM University
   const [teams, setTeams] = useState<Team[]>(MOCK_TEAMS);
   const [venues, setVenues] = useState<Venue[]>(MOCK_VENUES);
   const [matches, setMatches] = useState<Match[]>(MOCK_MATCHES);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -56,6 +60,24 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const clearToast = () => {
     setToastMessage(null);
+  };
+
+  // Sync theme with document element
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const root = document.documentElement;
+      if (theme === 'dark') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+      }
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   useEffect(() => {
@@ -71,7 +93,13 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const found = MOCK_USERS.find((u) => u.role === role);
     if (found) {
       setCurrentUser(found);
-      showToast(`Switched view to ${role.replace('_', ' ')} (${found.fullName})`);
+      const roleNameRu =
+        role === 'STUDENT_CAPTAIN'
+          ? 'Капитан команды'
+          : role === 'VENUE_MANAGER'
+          ? 'Менеджер площадки'
+          : 'Супер-Администратор';
+      showToast(`Переключена роль: ${roleNameRu} (${found.fullName})`);
     }
   };
 
@@ -88,11 +116,11 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     paymentMethod,
   }: BookingConfirmationParams) => {
     const venue = venues.find((v) => v.id === venueId);
-    if (!venue) return { success: false, error: 'Venue not found' };
+    if (!venue) return { success: false, error: 'Площадка не найдена' };
 
     const slot = venue.slots.find((s) => s.id === slotId);
-    if (!slot) return { success: false, error: 'Slot not found' };
-    if (slot.isBooked) return { success: false, error: 'Slot is already booked' };
+    if (!slot) return { success: false, error: 'Слот не найден' };
+    if (slot.isBooked) return { success: false, error: 'Этот слот уже занят' };
 
     const challenger = teams.find((t) => t.id === challengerTeamId) || userTeam;
     const opponent = opponentTeamId ? teams.find((t) => t.id === opponentTeamId) : undefined;
@@ -126,7 +154,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       slot: { ...slot, isBooked: true },
       status: opponent ? 'BOOKED' : 'OPEN',
       scheduledDate: slot.startTime,
-      description: matchDescription || `${challenger.name} looking for opponent at ${venue.name}`,
+      description: matchDescription || `${challenger.name} (${challenger.universityName}) ищет соперников в ${venue.name}`,
       createdAt: new Date().toISOString(),
       booking: {
         id: `bk-${Date.now()}`,
@@ -142,17 +170,17 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     setMatches((prev) => [newMatch, ...prev]);
-    showToast(`Slot confirmed at ${venue.name}! Prepayment of $${price} secured.`);
+    showToast(`Слот забронирован в ${venue.name}! Предоплата ${formatCurrency(price)} защищена.`);
     return { success: true, match: newMatch };
   };
 
   const acceptChallenge = (matchId: string, opponentTeamId: string, isSplit: boolean) => {
     const match = matches.find((m) => m.id === matchId);
-    if (!match) return { success: false, error: 'Match challenge not found' };
-    if (match.status !== 'OPEN') return { success: false, error: 'Challenge is no longer open' };
+    if (!match) return { success: false, error: 'Вызов не найден' };
+    if (match.status !== 'OPEN') return { success: false, error: 'Этот вызов уже занят или завершен' };
 
     const opponent = teams.find((t) => t.id === opponentTeamId);
-    if (!opponent) return { success: false, error: 'Opponent team not found' };
+    if (!opponent) return { success: false, error: 'Команда соперника не найдена' };
 
     const splitAmount = match.slot.price / 2;
 
@@ -175,14 +203,14 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       })
     );
 
-    showToast(`Challenge Accepted! ${opponent.name} matched with ${match.challengerTeam.name}. $${splitAmount} paid.`);
+    showToast(`Вызов принят! ${opponent.name} сыграет против ${match.challengerTeam.name}. Доплата ${formatCurrency(splitAmount)} зафиксирована.`);
     return { success: true };
   };
 
   const cancelBooking = (matchId: string) => {
     const match = matches.find((m) => m.id === matchId);
     if (!match || !match.booking) {
-      return { success: false, refunded: false, message: 'Match or booking not found.' };
+      return { success: false, refunded: false, message: 'Бронирование или матч не найдены.' };
     }
 
     const now = new Date();
@@ -220,11 +248,11 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
 
     if (isWithin48Hours) {
-      const msg = 'Strict 48H Policy Applied: Cancellation was within 48h of slot start. Deposit forfeited to Venue.';
+      const msg = 'Правило 48 часов: Отмена менее чем за 48 ч до начала. Залог удержан в пользу площадки.';
       showToast(msg);
       return { success: true, refunded: false, message: msg };
     } else {
-      const msg = 'Booking cancelled >48h before match. 100% deposit refunded to your account.';
+      const msg = 'Бронь отменена более чем за 48 ч. 100% залога возвращено на ваш счет.';
       showToast(msg);
       return { success: true, refunded: true, message: msg };
     }
@@ -248,11 +276,10 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       challengerTeamId: userTeam.id,
       matchDescription: description,
       isSplitPayment: true,
-      paymentMethod: 'STRIPE',
+      paymentMethod: 'PAYME',
     });
   };
 
-  // Award points: Win = 3pts, Draw = 1pt, Loss = 0pts
   const awardPoints = (teamId: string, result: 'WIN' | 'DRAW' | 'LOSS') => {
     setTeams((prev) =>
       prev.map((t) => {
@@ -273,8 +300,8 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const submitMatchScore = (matchId: string, score1: number, score2: number) => {
     const match = matches.find((m) => m.id === matchId);
-    if (!match) return { success: false, error: 'Match not found' };
-    if (match.status === 'COMPLETED') return { success: false, error: 'Score already submitted' };
+    if (!match) return { success: false, error: 'Матч не найден' };
+    if (match.status === 'COMPLETED') return { success: false, error: 'Счет матча уже зафиксирован' };
 
     const challengerResult = score1 > score2 ? 'WIN' : score1 < score2 ? 'LOSS' : 'DRAW';
     const opponentResult = score2 > score1 ? 'WIN' : score2 < score1 ? 'LOSS' : 'DRAW';
@@ -296,15 +323,15 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       score1 > score2
         ? match.challengerTeam.name
         : score2 > score1
-        ? match.opponentTeam?.name ?? 'Opponent'
+        ? match.opponentTeam?.name ?? 'Соперник'
         : null;
-    showToast(winner ? `🏆 Final Score recorded! ${winner} wins ${score1}-${score2}.` : `🤝 Draw recorded! ${score1}-${score2}.`);
+    showToast(winner ? `🏆 Финальный счет зафиксирован! ${winner} побеждает ${score1}:${score2}.` : `🤝 Зафиксирована ничья ${score1}:${score2}.`);
     return { success: true };
   };
 
   const resolveDispute = (matchId: string, winnerId: string | null) => {
     const match = matches.find((m) => m.id === matchId);
-    if (!match) return { success: false, error: 'Match not found' };
+    if (!match) return { success: false, error: 'Матч не найден' };
 
     if (winnerId) {
       const loserId =
@@ -312,11 +339,11 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       awardPoints(winnerId, 'WIN');
       if (loserId) awardPoints(loserId, 'LOSS');
       const winnerTeam = teams.find((t) => t.id === winnerId);
-      showToast(`⚖️ Dispute resolved: ${winnerTeam?.name ?? 'Team'} awarded the victory.`);
+      showToast(`⚖️ Диспут урегулирован: победа присуждена команде ${winnerTeam?.name ?? 'Команда'}.`);
     } else {
       if (match.challengerTeamId) awardPoints(match.challengerTeamId, 'DRAW');
       if (match.opponentTeamId) awardPoints(match.opponentTeamId, 'DRAW');
-      showToast(`⚖️ Dispute resolved: Match declared a Draw.`);
+      showToast(`⚖️ Диспут урегулирован: матч объявлен ничейным.`);
     }
 
     setMatches((prev) =>
@@ -327,13 +354,13 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const disputeMatch = (matchId: string) => {
     const match = matches.find((m) => m.id === matchId);
-    if (!match) return { success: false, error: 'Match not found' };
-    if (match.status !== 'COMPLETED') return { success: false, error: 'Only completed matches can be disputed' };
+    if (!match) return { success: false, error: 'Матч не найден' };
+    if (match.status !== 'COMPLETED') return { success: false, error: 'Только завершенный матч можно опротестовать' };
 
     setMatches((prev) =>
       prev.map((m) => (m.id !== matchId ? m : { ...m, status: 'DISPUTED' }))
     );
-    showToast(`🚩 Dispute filed for match at ${match.venue.name}. Admin will review.`);
+    showToast(`🚩 Подан протест на результат матча в ${match.venue.name}. Администратор рассмотрит заявку.`);
     return { success: true };
   };
 
@@ -342,13 +369,13 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setVenues((prev) =>
       prev.map((v) => (v.id !== venueId ? v : { ...v, isFeatured: true }))
     );
-    showToast(`✅ Venue "${venue?.name ?? venueId}" approved & marked as Featured.`);
+    showToast(`✅ Площадка «${venue?.name ?? venueId}» верифицирована и получила статус Featured.`);
     return { success: true };
   };
 
   const suspendTeam = (teamId: string) => {
     const team = teams.find((t) => t.id === teamId);
-    showToast(`🚫 Team "${team?.name ?? teamId}" has been suspended by Admin.`);
+    showToast(`🚫 Команда «${team?.name ?? teamId}» временно дисквалифицирована Администратором.`);
     return { success: true };
   };
 
@@ -370,6 +397,8 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         disputeMatch,
         approveVenue,
         suspendTeam,
+        theme,
+        toggleTheme,
         toastMessage,
         clearToast,
         showToast,

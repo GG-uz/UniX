@@ -1,6 +1,37 @@
 export type UserRole = 'STUDENT_CAPTAIN' | 'VENUE_MANAGER' | 'SUPER_ADMIN';
 
-export type SportType = 'FOOTBALL' | 'BASKETBALL' | 'VOLLEYBALL';
+export type SportType = 
+  | 'FOOTBALL' 
+  | 'BASKETBALL' 
+  | 'VOLLEYBALL' 
+  | 'MATHEMATICS' 
+  | 'PHYSICS' 
+  | 'CHEMISTRY' 
+  | 'IT_HACKATHON' 
+  | 'ESPORTS' 
+  | 'CASE_CHAMPIONSHIP';
+
+export type DisciplineCategory = 'SPORT' | 'SCIENCE' | 'TECH' | 'BUSINESS';
+
+export interface DisciplineInfo {
+  type: SportType;
+  labelRu: string;
+  category: DisciplineCategory;
+  categoryRu: string;
+  icon: string;
+}
+
+export const DISCIPLINE_LIST: DisciplineInfo[] = [
+  { type: 'FOOTBALL', labelRu: 'Футбол 5x5', category: 'SPORT', categoryRu: 'Спорт', icon: '⚽' },
+  { type: 'BASKETBALL', labelRu: 'Баскетбол 3x3', category: 'SPORT', categoryRu: 'Спорт', icon: '🏀' },
+  { type: 'VOLLEYBALL', labelRu: 'Волейбол', category: 'SPORT', categoryRu: 'Спорт', icon: '🏐' },
+  { type: 'MATHEMATICS', labelRu: 'Математика & Матбои', category: 'SCIENCE', categoryRu: 'Наука & Олимпиады', icon: '📐' },
+  { type: 'PHYSICS', labelRu: 'Физика & Инженерия', category: 'SCIENCE', categoryRu: 'Наука & Олимпиады', icon: '⚡' },
+  { type: 'CHEMISTRY', labelRu: 'Химия & ЛабХакатон', category: 'SCIENCE', categoryRu: 'Наука & Олимпиады', icon: '🧪' },
+  { type: 'IT_HACKATHON', labelRu: 'IT & Хакатоны (AI/Dev)', category: 'TECH', categoryRu: 'IT & Кибер', icon: '💻' },
+  { type: 'ESPORTS', labelRu: 'Киберспорт (CS2/Dota2)', category: 'TECH', categoryRu: 'IT & Кибер', icon: '🎮' },
+  { type: 'CASE_CHAMPIONSHIP', labelRu: 'Кейс-чемпионаты & Дебаты', category: 'BUSINESS', categoryRu: 'Бизнес & Лидерство', icon: '📊' },
+];
 
 export type MatchStatus = 'OPEN' | 'BOOKED' | 'COMPLETED' | 'DISPUTED';
 
@@ -36,7 +67,7 @@ export interface Slot {
   startTime: string; // ISO string
   endTime: string;   // ISO string
   isBooked: boolean;
-  price: number;
+  price: number;     // In UZS (сум), <= 300 000
 }
 
 export interface Venue {
@@ -45,7 +76,7 @@ export interface Venue {
   managerId: string;
   address: string;
   city: string;
-  hourlyRate: number;
+  hourlyRate: number; // In UZS (сум), <= 300 000
   sportTypes: SportType[];
   surfaceType: string;
   isFeatured: boolean;
@@ -81,10 +112,10 @@ export interface Booking {
   id: string;
   matchId: string;
   userId: string;
-  amountPaid: number;
+  amountPaid: number; // In UZS
   paymentStatus: PaymentStatus;
   cancellationDeadline: string; // Slot Start Time - 48 Hours
   isSplitPayment: boolean;
-  paymentMethod: 'STRIPE' | 'SBP' | 'CARD';
+  paymentMethod: 'UZUM' | 'PAYME' | 'CLICK' | 'STRIPE';
   createdAt: string;
 }

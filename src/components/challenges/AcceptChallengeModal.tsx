@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { Match } from '@/types';
 import { useAppState } from '@/context/AppStateContext';
-import { Swords, ShieldAlert, CreditCard, X, CheckCircle2, Lock } from 'lucide-react';
-import { formatCurrency, formatDate, formatTime } from '@/lib/utils';
+import { Swords, ShieldAlert, X, CheckCircle2, Lock } from 'lucide-react';
+import { formatCurrency, formatDate, formatTime, getDisciplineLabel } from '@/lib/utils';
 
 interface AcceptChallengeModalProps {
   isOpen: boolean;
@@ -20,13 +20,13 @@ export const AcceptChallengeModal: React.FC<AcceptChallengeModalProps> = ({
   const { teams, userTeam, acceptChallenge } = useAppState();
   const [selectedTeamId, setSelectedTeamId] = useState(userTeam.id);
   const [agreed, setAgreed] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'STRIPE' | 'SBP' | 'CARD'>('STRIPE');
+  const [paymentMethod, setPaymentMethod] = useState<'UZUM' | 'PAYME' | 'CLICK' | 'STRIPE'>('PAYME');
 
   if (!isOpen) return null;
 
   const splitShare = match.slot.price / 2;
   const eligibleTeams = teams.filter(
-    (t) => t.id !== match.challengerTeamId && t.sportType === match.sportType
+    (t) => t.id !== match.challengerTeamId
   );
 
   const handleAccept = (e: React.FormEvent) => {
@@ -49,94 +49,105 @@ export const AcceptChallengeModal: React.FC<AcceptChallengeModalProps> = ({
               <Swords className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Accept Match Challenge</h3>
-              <p className="text-xs text-neutral-400">Lock shared arena reservation</p>
+              <h3 className="text-base font-black text-white">Принять Вызов на Матч</h3>
+              <p className="text-xs text-neutral-400">Совместная 50/50 аренда слота</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800"
+            className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleAccept} className="p-6 space-y-4 text-xs sm:text-sm">
-          {/* Matchup Summary */}
+        <form onSubmit={handleAccept} className="p-6 space-y-5 text-sm">
+          {/* Match Info Summary */}
           <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-neutral-400">Challenger:</span>
-              <span className="font-bold text-white">
-                {match.challengerTeam.name} ({match.challengerTeam.universityName})
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-amber-400 font-bold uppercase tracking-wider">
+                {getDisciplineLabel(match.sportType)}
+              </span>
+              <span className="text-neutral-400">
+                {formatDate(match.scheduledDate)} в {formatTime(match.scheduledDate)}
               </span>
             </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-neutral-400">Arena &amp; Kickoff:</span>
-              <span className="font-medium text-neutral-200">
-                {match.venue.name} • {formatDate(match.scheduledDate)} at {formatTime(match.scheduledDate)}
-              </span>
+            <div className="text-sm font-bold text-white">
+              Соперник: {match.challengerTeam.name} ({match.challengerTeam.universityName})
             </div>
-            <div className="flex justify-between items-center text-xs pt-1 border-t border-neutral-800">
-              <span className="text-neutral-400">Your Split Deposit:</span>
-              <span className="font-black text-amber-400 text-sm">{formatCurrency(splitShare)}</span>
+            <div className="text-xs text-neutral-400">
+              Локация: {match.venue.name} • {match.venue.surfaceType}
             </div>
           </div>
 
           {/* Select Your Team */}
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase mb-1">
-              Select Your Represented Team
+            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+              Выберите вашу команду
             </label>
             <select
               value={selectedTeamId}
               onChange={(e) => setSelectedTeamId(e.target.value)}
-              className="w-full py-2.5 px-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-white focus:outline-none focus:border-amber-500"
+              className="w-full p-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-white focus:outline-none focus:border-amber-500 cursor-pointer"
             >
               {eligibleTeams.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.name} ({t.universityName}) — {t.sportType}
+                  {t.logoUrl} {t.name} ({t.universityName})
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Payment Gateway */}
+          {/* Payment Split Callout */}
+          <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                Ваша 50% сплит-доля
+              </span>
+              <span className="text-xs text-neutral-400 mt-0.5 block">
+                Вторая половина уже внесена соперником
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-xl font-black text-amber-400">
+                {formatCurrency(splitShare)}
+              </span>
+            </div>
+          </div>
+
+          {/* 48h strict policy alert */}
+          <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 flex items-start gap-2 text-[11px] text-neutral-300">
+            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <span>
+              Политика 48ч: Отмена менее чем за 48 часов до игры влечет потерю залога в пользу площадки.
+            </span>
+          </div>
+
+          {/* Payment Method Selector */}
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase mb-1">
-              Payment Gateway
+            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+              Способ оплаты
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {['STRIPE', 'CARD', 'SBP'].map((p) => (
+            <div className="grid grid-cols-4 gap-2">
+              {(['PAYME', 'CLICK', 'UZUM', 'STRIPE'] as const).map((method) => (
                 <button
-                  key={p}
+                  key={method}
                   type="button"
-                  onClick={() => setPaymentMethod(p as any)}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 transition-colors ${
-                    paymentMethod === p
-                      ? 'border-amber-500 bg-amber-500/10 text-white'
-                      : 'border-neutral-800 bg-neutral-950 text-neutral-400 hover:text-white'
+                  onClick={() => setPaymentMethod(method)}
+                  className={`py-2 px-1 text-center rounded-xl text-xs font-bold border transition-all ${
+                    paymentMethod === method
+                      ? 'bg-amber-500 text-neutral-950 border-amber-400 font-black shadow-md'
+                      : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
                   }`}
                 >
-                  <CreditCard className="w-3.5 h-3.5 text-amber-400" />
-                  {p === 'STRIPE' ? 'Stripe' : p === 'CARD' ? 'Bank Card' : 'SBP Pay'}
+                  {method === 'UZUM' ? 'Uzum' : method}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Strict 48H Cancellation Rule Alert */}
-          <div className="p-3.5 rounded-2xl bg-amber-950/20 border border-amber-500/30 text-[11px] text-neutral-300 space-y-1.5">
-            <div className="font-bold text-amber-300 flex items-center gap-1.5">
-              <ShieldAlert className="w-4 h-4 text-amber-400" />
-              Prepayment &amp; 48H Guarantee Notice
-            </div>
-            <p>
-              Your deposit of <strong>{formatCurrency(splitShare)}</strong> will be held in league escrow.
-              Cancellations within 48 hours of kickoff forfeit the deposit.
-            </p>
-          </div>
-
-          <label className="flex items-start gap-2 pt-1 cursor-pointer">
+          {/* Agreement Checkbox */}
+          <label className="flex items-start gap-2.5 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={agreed}
@@ -144,21 +155,21 @@ export const AcceptChallengeModal: React.FC<AcceptChallengeModalProps> = ({
               className="mt-0.5 accent-amber-500 w-4 h-4 rounded cursor-pointer"
             />
             <span className="text-[11px] text-neutral-300">
-              I agree to pay {formatCurrency(splitShare)} and adhere to league fair play &amp; cancellation rules.
+              Подтверждаю участие команды и согласен с правилом 48 часов.
             </span>
           </label>
 
           <button
             type="submit"
             disabled={!agreed}
-            className={`w-full py-3.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all ${
+            className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
               agreed
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 shadow-orange-500/20 active:scale-95 cursor-pointer'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 hover:from-amber-400 hover:to-orange-400 active:scale-95 cursor-pointer shadow-lg shadow-orange-500/20'
                 : 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700'
             }`}
           >
-            <Lock className="w-4 h-4" />
-            <span>Pay Deposit ({formatCurrency(splitShare)}) &amp; Confirm Match</span>
+            <Lock className="w-3.5 h-3.5" />
+            Оплатить {formatCurrency(splitShare)} &amp; Подтвердить Матч
           </button>
         </form>
       </div>

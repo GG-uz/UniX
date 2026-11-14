@@ -4,57 +4,113 @@
 
 /* ========================================================
    UNISPORT LEAGUE – Global Design System
-   Dark-first theme: neutral-950 base, amber-500 accent
+   Dark & Light Theme Support with UZS Currency & Academic Disciplines
    ======================================================== */
 
 :root {
-  --background: #09090b;         /* neutral-950 */
-  --foreground: #fafafa;         /* neutral-50 */
+  --background: #f8fafc;         /* slate-50 */
+  --foreground: #0f172a;         /* slate-900 */
+  --card-bg:    #ffffff;
+  --card-border:#e2e8f0;         /* slate-200 */
   --accent:     #f59e0b;         /* amber-500 */
   --accent-glow: rgba(245,158,11,0.25);
-  --card:       #18181b;         /* neutral-900 */
-  --border:     #27272a;         /* neutral-800 */
+  --muted:      #64748b;         /* slate-500 */
+  --success:    #16a34a;
+  --warning:    #f59e0b;
+  --danger:     #dc2626;
+}
+
+html.dark {
+  --background: #09090b;         /* neutral-950 */
+  --foreground: #fafafa;         /* neutral-50 */
+  --card-bg:    #18181b;         /* neutral-900 */
+  --card-border:#27272a;         /* neutral-800 */
+  --accent:     #f59e0b;         /* amber-500 */
+  --accent-glow: rgba(245,158,11,0.25);
   --muted:      #71717a;         /* neutral-500 */
   --success:    #22c55e;
   --warning:    #f59e0b;
   --danger:     #ef4444;
 }
 
-/* Force dark background on html + body */
 html {
-  color-scheme: dark;
-  background-color: var(--background);
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* ── Scrollbar styling ── */
+/* Light mode overrides for neutral backgrounds */
+html:not(.dark) .bg-neutral-950 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .bg-neutral-900 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .bg-neutral-800 {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) .border-neutral-800,
+html:not(.dark) .border-neutral-900,
+html:not(.dark) .border-neutral-700 {
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .text-white {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-neutral-300,
+html:not(.dark) .text-neutral-400 {
+  color: #475569 !important;
+}
+
+html:not(.dark) .text-neutral-500 {
+  color: #64748b !important;
+}
+
+html:not(.dark) .hover\:bg-neutral-800:hover {
+  background-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .hover\:bg-neutral-900:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Scrollbar styling */
 * {
   scrollbar-width: thin;
+  scrollbar-color: #94a3b8 transparent;
+}
+html.dark * {
   scrollbar-color: #3f3f46 transparent;
 }
 *::-webkit-scrollbar        { width: 6px; height: 6px; }
 *::-webkit-scrollbar-track  { background: transparent; }
-*::-webkit-scrollbar-thumb  { background: #3f3f46; border-radius: 999px; }
+*::-webkit-scrollbar-thumb  { background: #94a3b8; border-radius: 999px; }
+html.dark *::-webkit-scrollbar-thumb { background: #3f3f46; }
 
-/* ── Selection ── */
+/* Selection */
 ::selection {
   background-color: var(--accent);
   color: #000;
 }
 
-/* ── Smooth scroll ── */
-html { scroll-behavior: smooth; }
-
-/* ── Animate-in utility (Tailwind 4 adds this natively, polyfill here) ── */
+/* Animate-in utilities */
 @keyframes fade-in         { from { opacity: 0; } to { opacity: 1; } }
 @keyframes zoom-in-95      { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes slide-in-bottom { from { transform: translateY(1.25rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -63,9 +119,3 @@ html { scroll-behavior: smooth; }
 .fade-in            { animation-name: fade-in; }
 .zoom-in-95         { animation-name: zoom-in-95; }
 .slide-in-from-bottom-5 { animation-name: slide-in-bottom; }
-
-/* ── Status badge helpers ── */
-.badge-open     { @apply bg-emerald-500/10 border border-emerald-500/30 text-emerald-400; }
-.badge-booked   { @apply bg-blue-500/10 border border-blue-500/30 text-blue-400; }
-.badge-disputed { @apply bg-red-500/10 border border-red-500/30 text-red-400; }
-.badge-featured { @apply bg-amber-500/10 border border-amber-500/30 text-amber-400; }

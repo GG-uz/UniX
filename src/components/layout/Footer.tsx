@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Flame, ShieldCheck, Clock, Award, Heart } from 'lucide-react';
+import { Flame, ShieldCheck, Clock, Award } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -15,8 +15,8 @@ export const Footer: React.FC = () => {
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-semibold text-sm">Strict 48-Hour Guarantee</div>
-              <div className="text-xs text-neutral-400">Cancel &gt;48h for 100% refund; late cancels forfeit deposit</div>
+              <div className="text-white font-bold text-sm">Гарантия 48 часов</div>
+              <div className="text-xs text-neutral-400">Отмена &gt;48ч — 100% возврат; при поздней отмене залог идет площадке</div>
             </div>
           </div>
 
@@ -25,8 +25,8 @@ export const Footer: React.FC = () => {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-semibold text-sm">Verified Arena Operators</div>
-              <div className="text-xs text-neutral-400">All venues inspected with FIFA / FIBA standard surfaces</div>
+              <div className="text-white font-bold text-sm">Проверенные Арены &amp; Хабы</div>
+              <div className="text-xs text-neutral-400">Кампусы вузов, научные лаборатории и сертифицированные стадионы</div>
             </div>
           </div>
 
@@ -35,8 +35,8 @@ export const Footer: React.FC = () => {
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-white font-semibold text-sm">Official Inter-Uni Rankings</div>
-              <div className="text-xs text-neutral-400">Automated points computation & official season cups</div>
+              <div className="text-white font-bold text-sm">Единый Студенческий Рейтинг</div>
+              <div className="text-xs text-neutral-400">Автоматический подсчет очков: Спортивная и Академическая Лиги</div>
             </div>
           </div>
         </div>
@@ -46,57 +46,59 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center">
-              <Flame className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center">
+              <Flame className="w-5 h-5 text-white" />
             </div>
-            <span className="font-extrabold text-white tracking-tight">UNISPORT LEAGUE</span>
+            <span className="font-black text-white tracking-tight">UNISPORT LEAGUE</span>
           </div>
           <p className="text-xs text-neutral-400 leading-relaxed mb-4">
-            The premier digital matchmaker and venue reservation infrastructure for collegiate student-athletes.
+            Единая межуниверситетская платформа Ташкента для спортивных матчей, матбоев, хакатонов и научных кейс-турниров.
           </p>
           <div className="text-xs text-neutral-400">
-            Powered by Next.js & Supabase
+            Цены до 300 000 сум/час • Защита от срывов
           </div>
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Sports Disciplines</h4>
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Направления Лиги</h4>
           <ul className="space-y-2 text-xs">
-            <li><Link href="/venues?sport=FOOTBALL" className="hover:text-amber-400 transition-colors">Football (5x5, 7x7, 11x11)</Link></li>
-            <li><Link href="/venues?sport=BASKETBALL" className="hover:text-amber-400 transition-colors">Basketball (3x3, Full Court)</Link></li>
-            <li><Link href="/venues?sport=VOLLEYBALL" className="hover:text-amber-400 transition-colors">Volleyball (Classic & Mixed)</Link></li>
-            <li><Link href="/challenges" className="hover:text-amber-400 transition-colors">Open Match Challenges</Link></li>
+            <li><Link href="/venues?sport=FOOTBALL" className="hover:text-amber-400 transition-colors">⚽ Футбол &amp; Баскетбол</Link></li>
+            <li><Link href="/venues?sport=MATHEMATICS" className="hover:text-amber-400 transition-colors">📐 Математика &amp; Матбои</Link></li>
+            <li><Link href="/venues?sport=PHYSICS" className="hover:text-amber-400 transition-colors">⚡ Физика &amp; Инженерия</Link></li>
+            <li><Link href="/venues?sport=CHEMISTRY" className="hover:text-amber-400 transition-colors">🧪 Химия &amp; Лаб-хакатоны</Link></li>
+            <li><Link href="/venues?sport=IT_HACKATHON" className="hover:text-amber-400 transition-colors">💻 IT Хакатоны &amp; Киберспорт</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Partner Universities</h4>
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Вузы-Участники</h4>
           <ul className="space-y-2 text-xs">
-            <li><span className="hover:text-white transition-colors">HSE University (Вышка)</span></li>
-            <li><span className="hover:text-white transition-colors">Bauman Moscow State Tech (МГТУ)</span></li>
-            <li><span className="hover:text-white transition-colors">Lomonosov Moscow State (МГУ)</span></li>
-            <li><span className="hover:text-white transition-colors">Moscow Inst. Physics & Tech (МФТИ)</span></li>
-            <li><span className="hover:text-white transition-colors">ITMO University (ИТМО)</span></li>
+            <li><span className="text-amber-400 font-bold">TEAM University</span></li>
+            <li><span className="hover:text-white transition-colors">WIUT (Westminster)</span></li>
+            <li><span className="hover:text-white transition-colors">Inha University Tashkent</span></li>
+            <li><span className="hover:text-white transition-colors">MDIST</span></li>
+            <li><span className="hover:text-white transition-colors">Amity University Tashkent</span></li>
+            <li><span className="hover:text-white transition-colors">TUIT (ТУИТ)</span></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Venue Management</h4>
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Партнерам и Площадкам</h4>
           <ul className="space-y-2 text-xs">
-            <li><Link href="/venues" className="hover:text-amber-400 transition-colors">List Your Sports Complex</Link></li>
-            <li><span className="text-amber-400 font-medium">Featured Priority Placement ($)</span></li>
-            <li><Link href="/venues" className="hover:text-amber-400 transition-colors">Automated Slot Scheduling</Link></li>
-            <li><span className="hover:text-white transition-colors">Stripe & Direct Payouts</span></li>
+            <li><Link href="/venues" className="hover:text-amber-400 transition-colors">Разместить Арену / Хаб</Link></li>
+            <li><span className="text-amber-400 font-medium">Статус «Featured» (Продвижение)</span></li>
+            <li><Link href="/challenges" className="hover:text-amber-400 transition-colors">Доска открытых вызовов</Link></li>
+            <li><span className="hover:text-white transition-colors">Оплата: Payme, Click, Uzum</span></li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-neutral-900 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-400 gap-4">
-        <div>&copy; 2026-2027 UniSport League Inc. All rights reserved.</div>
+        <div>&copy; 2026-2027 UniSport &amp; Project League Tashkent. Все права защищены.</div>
         <div className="flex items-center gap-6">
-          <Link href="/venues" className="hover:underline">Cancellation Policy</Link>
-          <Link href="/challenges" className="hover:underline">Fair Play Code</Link>
-          <Link href="/leaderboards" className="hover:underline">Rulebook 2026/2027</Link>
+          <Link href="/venues" className="hover:underline">Политика отмены 48ч</Link>
+          <Link href="/challenges" className="hover:underline">Кодекс Fair Play</Link>
+          <Link href="/leaderboards" className="hover:underline">Регламент Турниров</Link>
         </div>
       </div>
     </footer>

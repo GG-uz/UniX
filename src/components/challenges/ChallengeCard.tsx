@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Match } from '@/types';
 import { Swords, Clock, MapPin, AlertTriangle, CheckCircle2, Flag } from 'lucide-react';
-import { formatDate, formatTime, formatCurrency } from '@/lib/utils';
+import { formatDate, formatTime, formatCurrency, getDisciplineLabel } from '@/lib/utils';
 import { AcceptChallengeModal } from './AcceptChallengeModal';
 import { ScoreSubmitModal } from './ScoreSubmitModal';
 import { useAppState } from '@/context/AppStateContext';
@@ -27,10 +27,10 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
   const isDisputed = match.status === 'DISPUTED';
 
   const statusBadge = () => {
-    if (isOpen) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">Awaiting Rival</span>;
-    if (isBooked) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 border border-blue-500/30 text-blue-400">Match Confirmed</span>;
-    if (isCompleted) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 border border-purple-500/30 text-purple-400">Completed</span>;
-    if (isDisputed) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/10 border border-red-500/30 text-red-400">⚠ Disputed</span>;
+    if (isOpen) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">Ждет соперника</span>;
+    if (isBooked) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 border border-blue-500/30 text-blue-400">Матч подтвержден</span>;
+    if (isCompleted) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 border border-purple-500/30 text-purple-400">Завершен</span>;
+    if (isDisputed) return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/10 border border-red-500/30 text-red-400">⚠ Спор / Протест</span>;
     return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-neutral-800 text-neutral-400">{match.status}</span>;
   };
 
@@ -43,14 +43,14 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
         <div className="flex items-center justify-between text-xs mb-4">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-400">
-              {match.sportType}
+              {getDisciplineLabel(match.sportType)}
             </span>
             {statusBadge()}
           </div>
 
           <div className="text-neutral-400 text-xs flex items-center gap-1.5 font-medium">
             <Clock className="w-3.5 h-3.5 text-neutral-400" />
-            <span>{formatDate(match.scheduledDate)} at {formatTime(match.scheduledDate)}</span>
+            <span>{formatDate(match.scheduledDate)} в {formatTime(match.scheduledDate)}</span>
           </div>
         </div>
 
@@ -62,9 +62,9 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
               <span className="text-3xl shrink-0">{match.challengerTeam.logoUrl || '🛡️'}</span>
               <div className="min-w-0">
                 <div className="font-bold text-sm text-white truncate">{match.challengerTeam.name}</div>
-                <div className="text-[11px] text-neutral-400 truncate">{match.challengerTeam.universityName}</div>
-                <div className="text-[10px] text-amber-400 font-semibold mt-0.5">
-                  Pts: {match.challengerTeam.totalPoints} • {match.challengerTeam.matchesWon}W-{match.challengerTeam.matchesLost}L
+                <div className="text-[11px] text-amber-400 font-semibold truncate">{match.challengerTeam.universityName}</div>
+                <div className="text-[10px] text-neutral-400 mt-0.5">
+                  Очки: {match.challengerTeam.totalPoints} • {match.challengerTeam.matchesWon}В-{match.challengerTeam.matchesLost}П
                 </div>
               </div>
             </div>
@@ -88,17 +88,17 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
                 <>
                   <div className="min-w-0">
                     <div className="font-bold text-sm text-white truncate">{match.opponentTeam.name}</div>
-                    <div className="text-[11px] text-neutral-400 truncate">{match.opponentTeam.universityName}</div>
-                    <div className="text-[10px] text-amber-400 font-semibold mt-0.5">
-                      Pts: {match.opponentTeam.totalPoints} • {match.opponentTeam.matchesWon}W-{match.opponentTeam.matchesLost}L
+                    <div className="text-[11px] text-amber-400 font-semibold truncate">{match.opponentTeam.universityName}</div>
+                    <div className="text-[10px] text-neutral-400 mt-0.5">
+                      Очки: {match.opponentTeam.totalPoints} • {match.opponentTeam.matchesWon}В-{match.opponentTeam.matchesLost}П
                     </div>
                   </div>
                   <span className="text-3xl shrink-0">{match.opponentTeam.logoUrl || '🛡️'}</span>
                 </>
               ) : (
                 <div className="text-right">
-                  <div className="text-xs font-bold text-amber-400">Open Slot</div>
-                  <div className="text-[11px] text-neutral-400">Accept to fill rival spot</div>
+                  <div className="text-xs font-bold text-amber-400">Слот свободен</div>
+                  <div className="text-[11px] text-neutral-400">Примите вызов</div>
                 </div>
               )}
             </div>
@@ -116,10 +116,10 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
             <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span className="text-white font-medium">{match.venue.name}</span>
             <span className="text-neutral-500">•</span>
-            <span>{match.venue.address}</span>
+            <span className="truncate">{match.venue.address}</span>
           </div>
           <div className="text-[11px] text-neutral-400 pl-5">
-            Surface: {match.venue.surfaceType}
+            Покрытие/Зал: {match.venue.surfaceType}
           </div>
         </div>
       </div>
@@ -127,11 +127,11 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
       {/* Prepayment info & Action CTA */}
       <div className="pt-4 border-t border-neutral-800/80 flex items-center justify-between">
         <div>
-          <span className="text-[11px] text-neutral-400 block">Split Share:</span>
-          <span className="text-sm font-extrabold text-amber-400">
+          <span className="text-[10px] text-neutral-400 uppercase font-bold block">Сплит-доля команды:</span>
+          <span className="text-sm font-black text-amber-400">
             {formatCurrency(match.slot.price / 2)}
           </span>
-          <span className="text-[10px] text-neutral-400 ml-1">/ team</span>
+          <span className="text-[10px] text-neutral-400 ml-1">/ команда</span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap justify-end">
@@ -139,17 +139,17 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
           {isOpen && !isChallengerMine && (
             <button
               onClick={() => setAcceptModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 shadow-md shadow-orange-500/20 active:scale-95 transition-all"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-neutral-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-orange-500/20 active:scale-95 transition-all cursor-pointer"
             >
               <Swords className="w-3.5 h-3.5" />
-              Accept Challenge
+              Принять Вызов
             </button>
           )}
 
           {/* My challenge active */}
           {isOpen && isChallengerMine && (
-            <span className="px-3 py-1.5 rounded-xl bg-neutral-800 text-neutral-300 text-xs font-semibold">
-              Your Challenge Active
+            <span className="px-3 py-1.5 rounded-xl bg-neutral-800 text-amber-400 border border-neutral-700 text-xs font-bold">
+              Ваш Вызов Активен
             </span>
           )}
 
@@ -157,10 +157,10 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
           {isMine && isBooked && (
             <button
               onClick={() => setScoreModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 border border-purple-700 text-purple-300 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Submit Score
+              Внести Счет
             </button>
           )}
 
@@ -168,10 +168,10 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
           {isMine && isCompleted && (
             <button
               onClick={() => disputeMatch(match.id)}
-              className="px-3 py-1.5 rounded-xl bg-orange-950/40 hover:bg-orange-900/60 border border-orange-800 text-orange-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-orange-950/40 hover:bg-orange-900/60 border border-orange-800 text-orange-300 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Flag className="w-3.5 h-3.5" />
-              Dispute Result
+              Опротестовать
             </button>
           )}
 
@@ -179,10 +179,10 @@ export const ChallengeCard: React.FC<ChallengeCardProps> = ({ match }) => {
           {isMine && match.booking && (isOpen || isBooked) && (
             <button
               onClick={() => cancelBooking(match.id)}
-              className="px-3 py-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-900 text-red-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-900 text-red-300 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <AlertTriangle className="w-3.5 h-3.5" />
-              Cancel Match
+              Отменить Бронь
             </button>
           )}
         </div>

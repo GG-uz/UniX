@@ -5,16 +5,16 @@ import { useSearchParams } from 'next/navigation';
 import { useAppState } from '@/context/AppStateContext';
 import { ChallengeCard } from '@/components/challenges/ChallengeCard';
 import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
-import { Swords, Plus, Filter, Sparkles } from 'lucide-react';
-import { SportType } from '@/types';
+import { Swords, Plus } from 'lucide-react';
+import { DISCIPLINE_LIST } from '@/types';
 
 function ChallengesContent() {
   const searchParams = useSearchParams();
   const initialSport = searchParams.get('sport') || 'ALL';
 
-  const { matches, userTeam } = useAppState();
+  const { matches } = useAppState();
   const [selectedSport, setSelectedSport] = useState(initialSport);
-  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'BOOKED'>('ALL');
+  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'BOOKED' | 'COMPLETED'>('ALL');
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const filteredMatches = matches.filter((m) => {
@@ -33,117 +33,107 @@ function ChallengesContent() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider mb-2">
               <Swords className="w-3.5 h-3.5" />
-              Inter-University Matchmaking
+              Межуниверситетский Матчмейкинг
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Challenge Board &amp; Match Feed
+              Доска Вызовов &amp; Лента Матчей
             </h1>
             <p className="text-sm text-neutral-400 mt-1 max-w-2xl">
-              Post open match requests, accept challenges from rival faculties, and split arena rental fees automatically with guaranteed escrow protection.
+              Публикуйте открытые вызовы, принимайте соперников от других вузов (TEAM University, WIUT, Inha, MDIST, Amity, ТУИТ) и автоматически делите стоимость аренды пополам.
             </p>
           </div>
 
           {/* Post Challenge CTA */}
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-neutral-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-orange-500/20 active:scale-95 transition-all"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-neutral-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-orange-500/20 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Post New Challenge</span>
+            <span>Опубликовать Новый Вызов</span>
           </button>
         </div>
 
         {/* Filter Controls */}
-        <div className="p-4 rounded-2xl bg-neutral-900 border border-neutral-800 flex flex-wrap items-center justify-between gap-3 mb-8">
-          {/* Sport Selector */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-neutral-950 border border-neutral-800">
-            {['ALL', 'FOOTBALL', 'BASKETBALL', 'VOLLEYBALL'].map((sport) => (
+        <div className="p-4 rounded-3xl bg-neutral-900 border border-neutral-800 flex flex-wrap items-center justify-between gap-3 mb-8 shadow-lg">
+          {/* Discipline Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-neutral-400">Направление:</span>
+            <select
+              value={selectedSport}
+              onChange={(e) => setSelectedSport(e.target.value)}
+              className="py-1.5 px-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-white focus:outline-none focus:border-amber-500 cursor-pointer"
+            >
+              <option value="ALL">Все дисциплины ({DISCIPLINE_LIST.length})</option>
+              {DISCIPLINE_LIST.map((d) => (
+                <option key={d.type} value={d.type}>
+                  {d.icon} {d.labelRu}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Pills */}
+          <div className="flex items-center gap-1.5">
+            {[
+              { id: 'ALL', label: 'Все матчи' },
+              { id: 'OPEN', label: `Ждут соперника (${openCount})` },
+              { id: 'BOOKED', label: 'Подтвержденные' },
+              { id: 'COMPLETED', label: 'Завершенные' },
+            ].map((st) => (
               <button
-                key={sport}
-                onClick={() => setSelectedSport(sport)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  selectedSport === sport
-                    ? 'bg-amber-500 text-neutral-950 shadow-md'
+                key={st.id}
+                onClick={() => setSelectedStatus(st.id as any)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  selectedStatus === st.id
+                    ? 'bg-amber-500/20 border border-amber-500 text-amber-400'
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
                 }`}
               >
-                {sport === 'ALL' ? 'All Sports' : sport === 'FOOTBALL' ? '⚽ Football' : sport === 'BASKETBALL' ? '🏀 Basketball' : '🏐 Volleyball'}
+                {st.label}
               </button>
             ))}
           </div>
-
-          {/* Status Tabs */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSelectedStatus('ALL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors ${
-                selectedStatus === 'ALL'
-                  ? 'bg-neutral-800 text-white border-neutral-700'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
-              }`}
-            >
-              All Fixtures
-            </button>
-            <button
-              onClick={() => setSelectedStatus('OPEN')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5 ${
-                selectedStatus === 'OPEN'
-                  ? 'bg-amber-500/20 text-amber-400 border-amber-500'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
-              }`}
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Open ({openCount})
-            </button>
-            <button
-              onClick={() => setSelectedStatus('BOOKED')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors ${
-                selectedStatus === 'BOOKED'
-                  ? 'bg-blue-500/20 text-blue-400 border-blue-500'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
-              }`}
-            >
-              Locked &amp; Confirmed
-            </button>
-          </div>
         </div>
 
-        {/* Challenges Grid */}
+        {/* Challenge Cards Grid */}
         {filteredMatches.length === 0 ? (
-          <div className="p-12 text-center rounded-3xl bg-neutral-900 border border-neutral-800">
-            <Swords className="w-10 h-10 text-neutral-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white">No challenges match this filter</h3>
-            <p className="text-xs text-neutral-400 mt-1">Be the first to post a match challenge for your university team!</p>
+          <div className="p-12 text-center rounded-3xl bg-neutral-900 border border-neutral-800 shadow-xl">
+            <p className="text-sm text-neutral-400">
+              По выбранным фильтрам активных вызовов не найдено.
+            </p>
             <button
-              onClick={() => setCreateModalOpen(true)}
-              className="mt-4 px-4 py-2 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs"
+              onClick={() => {
+                setSelectedSport('ALL');
+                setSelectedStatus('ALL');
+              }}
+              className="mt-3 text-xs text-amber-400 font-bold hover:underline"
             >
-              Post Challenge Now
+              Сбросить фильтры
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {filteredMatches.map((match) => (
               <ChallengeCard key={match.id} match={match} />
             ))}
           </div>
         )}
-
-        {/* Create Challenge Modal */}
-        {createModalOpen && (
-          <CreateChallengeModal
-            isOpen={createModalOpen}
-            onClose={() => setCreateModalOpen(false)}
-          />
-        )}
       </div>
+
+      {/* Create Challenge Modal */}
+      {createModalOpen && (
+        <CreateChallengeModal
+          isOpen={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
 
 export default function ChallengesPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-white">Loading challenges...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950 p-12 text-white">Загрузка вызовов...</div>}>
       <ChallengesContent />
     </Suspense>
   );

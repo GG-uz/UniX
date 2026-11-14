@@ -16,7 +16,7 @@ import {
   Phone,
   Mail,
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getDisciplineLabel } from '@/lib/utils';
 import Link from 'next/link';
 
 function VenueDetailContent() {
@@ -30,10 +30,10 @@ function VenueDetailContent() {
   if (!venue) {
     return (
       <div className="py-20 text-center">
-        <h2 className="text-xl font-bold text-white">Venue Not Found</h2>
-        <p className="text-sm text-neutral-400 mt-2">The requested arena does not exist or has been removed.</p>
+        <h2 className="text-xl font-bold text-white">Площадка не найдена</h2>
+        <p className="text-sm text-neutral-400 mt-2">Выбранная локация не существует или была перемещена.</p>
         <Link href="/venues" className="mt-4 inline-block text-amber-500 font-bold text-xs underline">
-          &larr; Back to Venues
+          &larr; Вернуться в каталог
         </Link>
       </div>
     );
@@ -47,13 +47,13 @@ function VenueDetailContent() {
         {/* Back navigation */}
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white mb-6 transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Arenas
+          <ArrowLeft className="w-4 h-4" /> Назад к списку локаций
         </button>
 
         {/* Hero Banner */}
-        <div className="relative rounded-3xl overflow-hidden border border-neutral-800 bg-neutral-900 mb-10">
+        <div className="relative rounded-3xl overflow-hidden border border-neutral-800 bg-neutral-900 mb-10 shadow-2xl">
           <div className="h-72 sm:h-96 w-full relative">
             <img
               src={venue.imageUrl}
@@ -62,119 +62,109 @@ function VenueDetailContent() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
 
-            {venue.isFeatured && (
-              <div className="absolute top-6 left-6 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs uppercase tracking-wider shadow-lg">
-                <Sparkles className="w-3.5 h-3.5" />
-                Featured Partner Arena
-              </div>
-            )}
+            {/* Badges */}
+            <div className="absolute top-6 left-6 flex items-center gap-2">
+              {venue.isFeatured && (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs uppercase tracking-wider shadow-lg">
+                  <Sparkles className="w-3.5 h-3.5 text-neutral-950" />
+                  Featured Партнер
+                </div>
+              )}
+            </div>
 
+            {/* Title & Info Bar */}
             <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-900/90 backdrop-blur-md border border-neutral-700 text-xs font-bold text-white">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span>{venue.rating}</span>
-                    <span className="text-neutral-400">({venue.reviewCount} verified matches)</span>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-neutral-900/90 backdrop-blur-md border border-neutral-700 text-xs text-neutral-300 font-medium">
-                    {venue.surfaceType}
-                  </span>
-                </div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                  {venue.name}
-                </h1>
-                <div className="flex items-center gap-1.5 text-xs text-neutral-300 mt-1">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block mb-1">
+                  {venue.surfaceType}
+                </span>
+                <h1 className="text-2xl sm:text-4xl font-black text-white">{venue.name}</h1>
+                <div className="flex items-center gap-2 text-xs text-neutral-300 mt-2">
                   <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
                   <span>{venue.address}, {venue.city}</span>
                 </div>
               </div>
 
-              <div className="bg-neutral-900/90 backdrop-blur-md border border-neutral-800 p-4 rounded-2xl text-right">
-                <div className="text-xs text-neutral-400">Rental Rate</div>
-                <div className="text-2xl font-black text-white">{formatCurrency(venue.hourlyRate)}</div>
-                <div className="text-[11px] text-emerald-400 font-semibold">{availableSlotsCount} open slots</div>
+              {/* Price Callout */}
+              <div className="p-4 rounded-2xl bg-neutral-950/90 backdrop-blur-md border border-neutral-800 text-right shrink-0">
+                <span className="text-[10px] uppercase font-bold text-neutral-400 block">
+                  Тариф аренды
+                </span>
+                <span className="text-2xl font-black text-amber-400">
+                  {formatCurrency(venue.hourlyRate)}
+                </span>
+                <span className="text-xs text-neutral-400 ml-1">/ час</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left / Main Column: Time Slots Grid */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-extrabold text-white">Available Time Slots</h2>
-                <p className="text-xs text-neutral-400 mt-0.5">
-                  Click any open slot to reserve or create an open challenge with 50% split deposit.
-                </p>
+        {/* Two-Column Grid: Left Details & Right Strict Policy Notice */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          {/* Left Details */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="p-6 rounded-3xl bg-neutral-900 border border-neutral-800 shadow-xl space-y-4">
+              <h3 className="text-base font-bold text-white">Доступные дисциплины и проекты</h3>
+              <div className="flex flex-wrap gap-2">
+                {venue.sportTypes.map((sp) => (
+                  <span
+                    key={sp}
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-950 text-neutral-200 border border-neutral-800"
+                  >
+                    {getDisciplineLabel(sp)}
+                  </span>
+                ))}
               </div>
-            </div>
 
-            <SlotGrid venue={venue} />
-          </div>
-
-          {/* Right Sidebar: Rules, Amenities & Manager Info */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* STRICT 48-HOUR CANCELLATION POLICY BOX */}
-            <div className="p-5 rounded-3xl bg-amber-950/20 border border-amber-500/40 text-xs space-y-3">
-              <div className="flex items-center gap-2 text-amber-400 font-bold uppercase tracking-wider text-[11px]">
-                <ShieldAlert className="w-4 h-4 text-amber-400" />
-                Strict 48-Hour Cancellation Rule
-              </div>
-              <p className="text-neutral-300 leading-relaxed text-xs">
-                All slot reservations at <strong>{venue.name}</strong> require prepayment.
-              </p>
-              <div className="bg-neutral-950 p-3 rounded-xl border border-neutral-800 text-[11px] space-y-1.5">
-                <div className="flex justify-between text-neutral-300">
-                  <span>&gt;48 Hours Before:</span>
-                  <span className="font-bold text-emerald-400">100% Full Refund</span>
-                </div>
-                <div className="flex justify-between text-neutral-300">
-                  <span>&le;48 Hours Before:</span>
-                  <span className="font-bold text-red-400">Deposit Forfeited</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Amenities Included */}
-            <div className="p-5 rounded-3xl bg-neutral-900 border border-neutral-800 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-white">
-                Arena Amenities
-              </h3>
-              <div className="space-y-2">
-                {venue.amenities.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-xs text-neutral-300">
-                    <CheckCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>{item}</span>
+              <h3 className="text-base font-bold text-white pt-2">Удобства и Оснащение</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {venue.amenities.map((am) => (
+                  <div key={am} className="flex items-center gap-2 text-xs text-neutral-300">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{am}</span>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Venue Manager Contact */}
-            <div className="p-5 rounded-3xl bg-neutral-900 border border-neutral-800 space-y-3 text-xs">
-              <h3 className="font-bold uppercase tracking-wider text-white text-xs">
-                Arena Manager
-              </h3>
-              <div className="flex items-center gap-3">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
-                  alt="Manager"
-                  className="w-10 h-10 rounded-full object-cover border border-neutral-700"
-                />
-                <div>
-                  <div className="font-bold text-white">Dmitry Smirnov</div>
-                  <div className="text-[11px] text-neutral-400">Verified Partner Operator</div>
-                </div>
+          {/* Right: Strict 48h Policy Box */}
+          <div className="p-6 rounded-3xl bg-amber-950/20 border border-amber-500/40 shadow-xl space-y-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <ShieldAlert className="w-5 h-5 shrink-0" />
+                <span>Гарантия Отмены (48 Часов)</span>
               </div>
-              <div className="pt-2 border-t border-neutral-800 space-y-1 text-neutral-400 text-[11px]">
-                <div>Response time: &lt; 15 mins</div>
-                <div>Prepayment: Stripe Escrow Protected</div>
+              <p className="text-xs text-neutral-300 mt-2 leading-relaxed">
+                На площадке действует строгое правило: отмена более чем за 48 часов до начала возвращает 100% залога. Поздняя отмена (&lt;48ч) передает депозит площадке.
+              </p>
+              <div className="mt-4 p-3 rounded-2xl bg-neutral-950 border border-amber-500/30 text-xs space-y-1.5 text-neutral-300">
+                <div className="text-amber-400 font-bold">Условия бронирования:</div>
+                <div>• Доступна сплит-оплата (50/50 с командой соперника)</div>
+                <div>• Оплата через Payme, Click, Uzum Bank или Карту</div>
+                <div>• Моментальное закрепление за вашей командой</div>
               </div>
             </div>
+
+            <div className="pt-4 border-t border-amber-500/20 flex items-center justify-between text-xs text-neutral-400">
+              <span>Свободных слотов:</span>
+              <span className="text-sm font-black text-white">{availableSlotsCount}</span>
+            </div>
           </div>
+        </div>
+
+        {/* Dynamic Slot Grid Section */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-black text-white">Расписание &amp; Доступные Слоты</h2>
+              <p className="text-xs text-neutral-400 mt-1">
+                Выберите удобное время для проведения матча или научного поединка.
+              </p>
+            </div>
+          </div>
+
+          <SlotGrid venue={venue} />
         </div>
       </div>
     </div>
@@ -183,7 +173,7 @@ function VenueDetailContent() {
 
 export default function VenueDetailPage() {
   return (
-    <Suspense fallback={<div className="py-20 text-center text-white">Loading arena details...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950 p-12 text-white">Загрузка площадки...</div>}>
       <VenueDetailContent />
     </Suspense>
   );
