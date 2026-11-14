@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../";
+@source "../../src";
 
 /* ========================================================
    UNISPORT LEAGUE – Global Design System
