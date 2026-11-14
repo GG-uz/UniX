@@ -4,33 +4,28 @@
 
 /* ========================================================
    UNISPORT LEAGUE – Global Design System
-   Dark & Light Theme Support with UZS Currency & Academic Disciplines
+   Dark Mode: Athletic Dark-Tech with Amber Neons
+   Light Mode: Radiant & Energetic Collegiate Sports (Warm Gold & Amber Sunburst)
    ======================================================== */
 
 :root {
-  --background: #f8fafc;         /* slate-50 */
-  --foreground: #0f172a;         /* slate-900 */
+  --background: #fbf7ee;         /* Radiant warm athletic ivory/sand */
+  --foreground: #0f172a;         /* Deep pitch slate for 100% readable text */
   --card-bg:    #ffffff;
-  --card-border:#e2e8f0;         /* slate-200 */
-  --accent:     #f59e0b;         /* amber-500 */
+  --card-border:#fde68a;         /* Warm amber-200 border */
+  --accent:     #f59e0b;         /* Amber-500 */
   --accent-glow: rgba(245,158,11,0.25);
-  --muted:      #64748b;         /* slate-500 */
-  --success:    #16a34a;
-  --warning:    #f59e0b;
-  --danger:     #dc2626;
+  --muted:      #475569;         /* Slate-600 */
 }
 
 html.dark {
-  --background: #09090b;         /* neutral-950 */
-  --foreground: #fafafa;         /* neutral-50 */
-  --card-bg:    #18181b;         /* neutral-900 */
-  --card-border:#27272a;         /* neutral-800 */
-  --accent:     #f59e0b;         /* amber-500 */
+  --background: #09090b;         /* Neutral-950 */
+  --foreground: #fafafa;         /* Neutral-50 */
+  --card-bg:    #18181b;         /* Neutral-900 */
+  --card-border:#27272a;         /* Neutral-800 */
+  --accent:     #f59e0b;         /* Amber-500 */
   --accent-glow: rgba(245,158,11,0.25);
-  --muted:      #71717a;         /* neutral-500 */
-  --success:    #22c55e;
-  --warning:    #f59e0b;
-  --danger:     #ef4444;
+  --muted:      #71717a;         /* Neutral-500 */
 }
 
 html {
@@ -45,50 +40,248 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Light mode overrides for neutral backgrounds */
+/* ========================================================
+   LIGHT MODE: VIBRANT, HIGH-CONTRAST & ENERGETIC ("ЯРКИЙ СПОРТ")
+   ======================================================== */
+
+/* 1. Page Background & Sections */
+html:not(.dark) body,
 html:not(.dark) .bg-neutral-950 {
-  background-color: #f8fafc !important;
+  background-color: #fbf7ee !important;
   color: #0f172a !important;
 }
 
-html:not(.dark) .bg-neutral-900 {
+/* Hero Section Sunburst Effect */
+html:not(.dark) section.bg-\[radial-gradient\(ellipse_at_top\,_var\(--tw-gradient-stops\)\)\] {
+  background: radial-gradient(ellipse at top, rgba(251, 191, 36, 0.35), rgba(254, 243, 199, 0.6) 40%, #fbf7ee 80%) !important;
+}
+
+html:not(.dark) .from-neutral-950.to-neutral-900 {
+  background: linear-gradient(to bottom, #fbf7ee, #fef3c7) !important;
+}
+
+html:not(.dark) .bg-neutral-900\/30 {
+  background-color: rgba(254, 243, 199, 0.45) !important;
+}
+
+/* 2. Cards & Panels */
+html:not(.dark) .bg-neutral-900,
+html:not(.dark) .bg-neutral-900\/90,
+html:not(.dark) .bg-neutral-900\/80,
+html:not(.dark) .bg-neutral-900\/60 {
   background-color: #ffffff !important;
   color: #0f172a !important;
+  border-color: #fde68a !important;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
-html:not(.dark) .bg-neutral-800 {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
-}
-
-html:not(.dark) .border-neutral-800,
-html:not(.dark) .border-neutral-900,
-html:not(.dark) .border-neutral-700 {
-  border-color: #e2e8f0 !important;
-}
-
-html:not(.dark) .text-white {
+/* 3. Nested Blocks (VS team faceoff boxes, inputs containers, stat cells) */
+html:not(.dark) .bg-neutral-950,
+html:not(.dark) .bg-neutral-950\/90,
+html:not(.dark) .bg-neutral-950\/80,
+html:not(.dark) .bg-neutral-950\/70,
+html:not(.dark) .bg-neutral-950\/60 {
+  background-color: #fff7ed !important; /* warm amber/orange tint */
+  border-color: #fed7aa !important;
   color: #0f172a !important;
 }
 
-html:not(.dark) .text-neutral-300,
+html:not(.dark) .bg-neutral-800,
+html:not(.dark) .bg-neutral-800\/80,
+html:not(.dark) .bg-neutral-800\/60 {
+  background-color: #fef3c7 !important; /* amber-100 */
+  color: #1e293b !important;
+  border-color: #fde68a !important;
+}
+
+/* 4. Borders */
+html:not(.dark) .border-neutral-800,
+html:not(.dark) .border-neutral-900,
+html:not(.dark) .border-neutral-700,
+html:not(.dark) .border-neutral-800\/80,
+html:not(.dark) .border-neutral-800\/50 {
+  border-color: #fed7aa !important;
+}
+
+/* 5. Typography: CRYSTAL CLEAR CONTRAST */
+html:not(.dark) .text-white,
+html:not(.dark) .text-neutral-100 {
+  color: #0f172a !important; /* Deep dark slate */
+}
+
+html:not(.dark) .text-neutral-200,
+html:not(.dark) .text-neutral-300 {
+  color: #334155 !important; /* Rich readable slate */
+}
+
 html:not(.dark) .text-neutral-400 {
-  color: #475569 !important;
+  color: #475569 !important; /* Readable medium slate */
 }
 
 html:not(.dark) .text-neutral-500 {
   color: #64748b !important;
 }
 
-html:not(.dark) .hover\:bg-neutral-800:hover {
-  background-color: #e2e8f0 !important;
+/* Vibrant Readable Accents in Light Mode */
+html:not(.dark) .text-amber-400,
+html:not(.dark) .text-amber-300 {
+  color: #b45309 !important; /* Deep rich amber (Contrast 5.2:1 against light bg) */
 }
 
+html:not(.dark) .text-emerald-400,
+html:not(.dark) .text-emerald-300 {
+  color: #15803d !important; /* Deep rich emerald */
+}
+
+html:not(.dark) .text-red-400,
+html:not(.dark) .text-red-300 {
+  color: #b91c1c !important; /* Deep bold red */
+}
+
+html:not(.dark) .text-purple-400,
+html:not(.dark) .text-purple-300 {
+  color: #6b21a8 !important; /* Deep royal purple */
+}
+
+html:not(.dark) .text-blue-400,
+html:not(.dark) .text-blue-300 {
+  color: #1d4ed8 !important; /* Deep athletic blue */
+}
+
+html:not(.dark) .text-orange-400 {
+  color: #c2410c !important; /* Deep fiery orange */
+}
+
+/* 6. Header / Navigation */
+html:not(.dark) header {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-bottom-color: #fed7aa !important;
+  box-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.08) !important;
+}
+
+html:not(.dark) header nav a {
+  color: #334155 !important;
+}
+
+html:not(.dark) header nav a:hover {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+html:not(.dark) header nav a.bg-amber-500\/15 {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #f59e0b !important;
+}
+
+/* 7. Badges & Pills */
+html:not(.dark) .bg-amber-500\/10,
+html:not(.dark) .bg-amber-500\/15,
+html:not(.dark) .bg-amber-500\/20 {
+  background-color: #fef3c7 !important;
+  border-color: #fcd34d !important;
+  color: #92400e !important;
+}
+
+html:not(.dark) .bg-emerald-500\/10,
+html:not(.dark) .bg-emerald-500\/20 {
+  background-color: #dcfce7 !important;
+  border-color: #86efac !important;
+  color: #166534 !important;
+}
+
+html:not(.dark) .bg-blue-500\/10 {
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
+}
+
+html:not(.dark) .bg-red-500\/10,
+html:not(.dark) .bg-red-950\/10,
+html:not(.dark) .bg-red-950\/20,
+html:not(.dark) .bg-red-950\/40 {
+  background-color: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #991b1b !important;
+}
+
+html:not(.dark) .bg-purple-500\/10,
+html:not(.dark) .bg-purple-900\/40 {
+  background-color: #f3e8ff !important;
+  border-color: #d8b4fe !important;
+  color: #581c87 !important;
+}
+
+html:not(.dark) .bg-orange-950\/40 {
+  background-color: #ffedd5 !important;
+  border-color: #fdba74 !important;
+  color: #c2410c !important;
+}
+
+/* 8. Form Inputs & Selects */
+html:not(.dark) input,
+html:not(.dark) select,
+html:not(.dark) textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #fed7aa !important;
+}
+
+html:not(.dark) input:focus,
+html:not(.dark) select:focus,
+html:not(.dark) textarea:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
+}
+
+html:not(.dark) select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* 9. Action Buttons with Gradients */
+html:not(.dark) .bg-gradient-to-r.from-amber-500.to-orange-500,
+html:not(.dark) .bg-gradient-to-r.from-amber-400.to-orange-400 {
+  color: #1c1917 !important; /* Pitch bold dark text on bright orange button */
+  box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.3) !important;
+}
+
+html:not(.dark) .bg-gradient-to-r.from-amber-500.to-orange-500 * {
+  color: #1c1917 !important;
+}
+
+/* 10. Modals & Overlays */
+html:not(.dark) .fixed.inset-0.bg-black\/80 {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+}
+
+/* 11. Tables */
+html:not(.dark) table thead {
+  background-color: #fef3c7 !important;
+  border-color: #fde68a !important;
+}
+
+html:not(.dark) table thead th {
+  color: #475569 !important;
+}
+
+html:not(.dark) table tbody tr:hover {
+  background-color: #fef9c3 !important;
+}
+
+/* 12. Hover States */
+html:not(.dark) .hover\:bg-neutral-800:hover,
 html:not(.dark) .hover\:bg-neutral-900:hover {
-  background-color: #f1f5f9 !important;
+  background-color: #fef3c7 !important;
+  color: #0f172a !important;
 }
 
 /* Scrollbar styling */
