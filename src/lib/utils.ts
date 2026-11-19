@@ -17,6 +17,7 @@ export function formatCurrency(amount: number): string {
 export function formatDate(dateString: string): string {
   const d = new Date(dateString);
   return d.toLocaleDateString('ru-RU', {
+    timeZone: 'Asia/Tashkent',
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -26,6 +27,7 @@ export function formatDate(dateString: string): string {
 export function formatTime(dateString: string): string {
   const d = new Date(dateString);
   return d.toLocaleTimeString('ru-RU', {
+    timeZone: 'Asia/Tashkent',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

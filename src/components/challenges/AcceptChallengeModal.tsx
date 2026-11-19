@@ -169,7 +169,7 @@ export const AcceptChallengeModal: React.FC<AcceptChallengeModalProps> = ({
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
-            Оплатить {formatCurrency(splitShare)} &amp; Подтвердить Матч
+            Принять демо-вызов · {formatCurrency(splitShare)} без списания
           </button>
         </form>
       </div>

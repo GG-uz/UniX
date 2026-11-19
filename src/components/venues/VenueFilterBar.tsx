@@ -107,7 +107,7 @@ export const VenueFilterBar: React.FC<VenueFilterBarProps> = ({
           />
           <span className="flex items-center gap-1.5 text-neutral-300 font-medium">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            Только Featured Партнеры (Приоритетное размещение)
+            Только площадки из демо-подборки
           </span>
         </label>
 

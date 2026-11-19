@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppState } from '@/context/AppStateContext';
 import { UserRole } from '@/types';
+import { officialEvent } from '@/lib/officialEvent';
 import {
   Trophy,
   MapPin,
@@ -26,18 +27,21 @@ export const Navbar: React.FC = () => {
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const isDemo = ['/challenges', '/leaderboards', '/profile', '/admin', '/venues'].some(
+    base => pathname === base || pathname.startsWith(`${base}/`)
+  );
   const navLinks = [
     { href: '/', label: 'Главная' },
-    { href: '/venues', label: 'Площадки & Хабы', icon: MapPin },
-    { href: '/challenges', label: 'Доска Вызовов', icon: Swords },
-    { href: '/leaderboards', label: 'Турнирная Таблица', icon: BarChart3 },
-    { href: '/profile', label: 'Моя Команда', icon: Trophy },
-    ...(currentUser.role === 'SUPER_ADMIN'
+    { href: '/challenges', label: 'Соревнования', icon: Swords },
+    { href: '/leaderboards', label: 'Рейтинги', icon: BarChart3 },
+    { href: officialEvent.href, label: 'Официальный матч' },
+    { href: '/profile', label: 'Профиль', icon: Trophy },
+    ...(isDemo && currentUser.role === 'SUPER_ADMIN'
       ? [{ href: '/admin', label: 'Панель Админа', icon: LayoutDashboard }]
       : []),
   ];
 
-  const roles: { role: UserRole; label: string; desc: string; icon: any }[] = [
+  const roles: { role: UserRole; label: string; desc: string; icon: typeof Trophy }[] = [
     {
       role: 'STUDENT_CAPTAIN',
       label: 'Студент-Капитан',
@@ -59,7 +63,8 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-neutral-950/90 border-b border-neutral-800 transition-colors">
+    <>
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-neutral-950/90 border-b border-neutral-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -69,20 +74,17 @@ export const Navbar: React.FC = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-black text-xl tracking-tight bg-gradient-to-r from-amber-400 via-orange-400 to-amber-200 bg-clip-text text-transparent">
-                UNISPORT
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30">
-                League
+                UniX
               </span>
             </div>
             <div className="text-[9px] text-neutral-400 font-medium">
-              Межуниверситетская Лига Ташкента
+              Университетские соревнования
             </div>
           </div>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+        <nav aria-label="Основная навигация" className="hidden xl:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             const Icon = link.icon;
@@ -90,6 +92,7 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
@@ -104,7 +107,7 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Right Actions: Theme Toggle, Role Selector & User Profile */}
-        <div className="hidden sm:flex items-center gap-2.5">
+        <div className="hidden xl:flex items-center gap-2.5">
           {/* Dark / Light Mode Switcher */}
           <button
             onClick={toggleTheme}
@@ -119,13 +122,13 @@ export const Navbar: React.FC = () => {
           </button>
 
           {/* Quick Role Switcher Pill */}
-          <div className="relative">
+          {isDemo && <div className="relative">
             <button
               onClick={() => setRoleMenuOpen(!roleMenuOpen)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-700/80 hover:border-amber-500/50 text-xs font-medium text-neutral-300 hover:text-white transition-all shadow-inner"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-neutral-400">Роль:</span>
+               <span className="text-neutral-400">Демо-роль:</span>
               <span className="text-amber-400 font-bold">
                 {currentUser.role === 'STUDENT_CAPTAIN'
                   ? 'Капитан'
@@ -176,10 +179,10 @@ export const Navbar: React.FC = () => {
                 })}
               </div>
             )}
-          </div>
+          </div>}
 
           {/* User Profile Mini Badge */}
-          <Link
+          {isDemo && <Link
             href="/profile"
             className="flex items-center gap-2 pl-2 py-1 pr-1 rounded-xl hover:bg-neutral-900 transition-colors"
           >
@@ -194,20 +197,23 @@ export const Navbar: React.FC = () => {
               alt={currentUser.fullName}
               className="w-8 h-8 rounded-xl object-cover border border-amber-500/40"
             />
-          </Link>
+          </Link>}
         </div>
 
         {/* Mobile Hamburger Toggle & Theme */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex xl:hidden items-center gap-2">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300"
+            aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'}
+            className="min-h-11 min-w-11 grid place-items-center rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900"
+            aria-label={mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={mobileMenuOpen}
+            className="min-h-11 min-w-11 grid place-items-center rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -216,7 +222,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-neutral-800 bg-neutral-950 px-4 pt-2 pb-6 space-y-2">
+        <nav aria-label="Мобильная навигация" className="xl:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-neutral-800 bg-neutral-950 px-4 pt-2 pb-6 space-y-2">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -224,6 +230,7 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold ${
                   isActive
@@ -236,8 +243,8 @@ export const Navbar: React.FC = () => {
               </Link>
             );
           })}
-          <div className="pt-4 border-t border-neutral-800 flex flex-col gap-2">
-            <span className="text-xs text-neutral-400">Роль:</span>
+          {isDemo && <div className="pt-4 border-t border-neutral-800 flex flex-col gap-2">
+            <span className="text-xs text-neutral-400">Демонстрационная роль:</span>
             <div className="grid grid-cols-3 gap-2">
               {roles.map((r) => (
                 <button
@@ -256,9 +263,17 @@ export const Navbar: React.FC = () => {
                 </button>
               ))}
             </div>
-          </div>
-        </div>
+          </div>}
+        </nav>
       )}
     </header>
+    {isDemo && (
+      <aside className="border-b border-amber-500/30 bg-neutral-900 px-4 py-3 text-center text-sm text-neutral-300">
+        <strong className="text-amber-400">Демонстрационные данные.</strong>{' '}
+        Команды, результаты, отзывы, партнёрские отметки и слоты — примеры. Реальных бронирований, платежей и возвратов нет.{' '}
+        <Link href={officialEvent.href} className="font-bold underline">К согласованному матчу</Link>
+      </aside>
+    )}
+    </>
   );
 };

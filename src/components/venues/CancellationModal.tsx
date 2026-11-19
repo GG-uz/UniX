@@ -250,7 +250,7 @@ export const CancellationModal: React.FC<CancellationModalProps> = ({
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
-            Оплатить {formatCurrency(payNowAmount)} &amp; Зафиксировать Слот
+            Демо-бронь · {formatCurrency(payNowAmount)} без списания
           </button>
         </form>
       </div>

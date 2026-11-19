@@ -67,7 +67,7 @@ function VenueDetailContent() {
               {venue.isFeatured && (
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs uppercase tracking-wider shadow-lg">
                   <Sparkles className="w-3.5 h-3.5 text-neutral-950" />
-                  Featured Партнер
+                  Демо-подборка
                 </div>
               )}
             </div>
@@ -133,7 +133,7 @@ function VenueDetailContent() {
             <div>
               <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
                 <ShieldAlert className="w-5 h-5 shrink-0" />
-                <span>Гарантия Отмены (48 Часов)</span>
+                <span>Пример условий отмены (48 часов)</span>
               </div>
               <p className="text-xs text-neutral-300 mt-2 leading-relaxed">
                 На площадке действует строгое правило: отмена более чем за 48 часов до начала возвращает 100% залога. Поздняя отмена (&lt;48ч) передает депозит площадке.
@@ -141,7 +141,7 @@ function VenueDetailContent() {
               <div className="mt-4 p-3 rounded-2xl bg-neutral-950 border border-amber-500/30 text-xs space-y-1.5 text-neutral-300">
                 <div className="text-amber-400 font-bold">Условия бронирования:</div>
                 <div>• Доступна сплит-оплата (50/50 с командой соперника)</div>
-                <div>• Оплата через Payme, Click, Uzum Bank или Карту</div>
+                <div>• Способы оплаты показаны для примера, списаний нет</div>
                 <div>• Моментальное закрепление за вашей командой</div>
               </div>
             </div>

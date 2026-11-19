@@ -60,7 +60,7 @@ function VenuesContent() {
             Арены, Коворкинги &amp; Научные Хабы
           </h1>
           <p className="text-sm text-neutral-400 mt-1">
-            Бронируйте слоты для футбола, матбоев, хакатонов и кейс-чемпионатов по ставке до 300 000 сум/час с гарантией защиты брони.
+            Пример каталога: подберите площадку по дисциплине, адресу и стоимости. Бронирование моделируется только в этой сессии.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ function VenuesContent() {
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="w-4 h-4 text-amber-400" />
               <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                Featured Партнеры (Приоритетное Размещение)
+                Демо-подборка площадок
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -101,7 +101,7 @@ function VenuesContent() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400">
               {onlyFeatured
-                ? `Найдено партнеров: ${featuredVenues.length}`
+                ? `Площадок в подборке: ${featuredVenues.length}`
                 : `Все доступные локации (${standardVenues.length})`}
             </h2>
           </div>

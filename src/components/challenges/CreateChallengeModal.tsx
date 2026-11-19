@@ -173,7 +173,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
-            Внести 50% &amp; Опубликовать Вызов
+            Опубликовать демо-вызов без списания
           </button>
         </form>
       </div>

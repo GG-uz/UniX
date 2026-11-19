@@ -14,13 +14,17 @@ function ChallengesContent() {
 
   const { matches } = useAppState();
   const [selectedSport, setSelectedSport] = useState(initialSport);
+  const [date, setDate] = useState(searchParams.get('date') || '');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'BOOKED' | 'COMPLETED'>('ALL');
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const filteredMatches = matches.filter((m) => {
     const matchesSport = selectedSport === 'ALL' || m.sportType === selectedSport;
     const matchesStatus = selectedStatus === 'ALL' || m.status === selectedStatus;
-    return matchesSport && matchesStatus;
+    const matchesDate = !date || new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Tashkent', year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(new Date(m.scheduledDate)) === date;
+    return matchesSport && matchesStatus && matchesDate;
   });
 
   const openCount = matches.filter((m) => m.status === 'OPEN').length;
@@ -72,8 +76,12 @@ function ChallengesContent() {
             </select>
           </div>
 
+          <label className="flex items-center gap-2 text-xs text-neutral-300">
+            Дата (Ташкент)
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2" />
+          </label>
           {/* Status Pills */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {[
               { id: 'ALL', label: 'Все матчи' },
               { id: 'OPEN', label: `Ждут соперника (${openCount})` },
@@ -103,7 +111,8 @@ function ChallengesContent() {
             </p>
             <button
               onClick={() => {
-                setSelectedSport('ALL');
+                 setSelectedSport('ALL');
+                 setDate('');
                 setSelectedStatus('ALL');
               }}
               className="mt-3 text-xs text-amber-400 font-bold hover:underline"

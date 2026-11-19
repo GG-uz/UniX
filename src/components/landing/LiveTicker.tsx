@@ -19,7 +19,7 @@ export const LiveTicker: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
             <h3 className="text-xs font-bold uppercase tracking-wider text-white">
-              Прямой эфир: Открытые вызовы &amp; Итоги матчей
+              Демонстрационные данные: вызовы и итоги матчей
             </h3>
           </div>
           <Link

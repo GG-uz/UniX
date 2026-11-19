@@ -12,7 +12,7 @@ export default function LeaderboardsPage() {
         <div className="mb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
             <Trophy className="w-3.5 h-3.5" />
-            Официальный Межуниверситетский Зачет
+              Демонстрационные данные · Пример зачёта
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
             Рейтинг Вузов &amp; Турнирная Таблица

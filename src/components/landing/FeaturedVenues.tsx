@@ -54,7 +54,7 @@ export const FeaturedVenues: React.FC = () => {
                   {/* Priority Sponsored Badge */}
                   <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs uppercase tracking-wider shadow-lg">
                     <Sparkles className="w-3.5 h-3.5 text-neutral-950" />
-                    Featured Партнер
+                    Демо-подборка
                   </div>
 
                   {/* Rating Badge */}

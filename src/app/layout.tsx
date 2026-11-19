@@ -7,9 +7,9 @@ import { Footer } from '@/components/layout/Footer';
 import { ToastBanner } from '@/components/ui/ToastBanner';
 
 export const metadata: Metadata = {
-  title: 'UniSport & Academic League Tashkent | Матчмейкинг и Бронирование Площадок',
+  title: { default: 'UniX — соревнования университетов Узбекистана', template: '%s | UniX' },
   description:
-    'Межуниверситетские битвы в Футболе, Математике, Физике, Химии и IT-Хакатонах среди вузов Ташкента (TEAM University, WIUT, Inha, MDIST, Amity, ТУИТ). Бронирование слотов до 300 000 сум/час с защитой 48 часов.',
+    'Спорт, образование, IT и бизнес на одной платформе. События и соревнования университетов Узбекистана.',
 };
 
 export default function RootLayout({
