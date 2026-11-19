@@ -82,15 +82,15 @@ function ChallengesContent() {
           </label>
           {/* Status Pills */}
           <div className="flex flex-wrap items-center gap-1.5">
-            {[
+            {([
               { id: 'ALL', label: 'Все матчи' },
               { id: 'OPEN', label: `Ждут соперника (${openCount})` },
               { id: 'BOOKED', label: 'Подтвержденные' },
               { id: 'COMPLETED', label: 'Завершенные' },
-            ].map((st) => (
+            ] as const).map((st) => (
               <button
                 key={st.id}
-                onClick={() => setSelectedStatus(st.id as any)}
+                onClick={() => setSelectedStatus(st.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   selectedStatus === st.id
                     ? 'bg-amber-500/20 border border-amber-500 text-amber-400'

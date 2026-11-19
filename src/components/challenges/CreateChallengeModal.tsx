@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useAppState } from '@/context/AppStateContext';
 import { SportType, DISCIPLINE_LIST } from '@/types';
-import { Swords, MapPin, X, Lock } from 'lucide-react';
-import { formatCurrency, formatDate, formatTime, getDisciplineLabel } from '@/lib/utils';
+import { Swords, X, Lock } from 'lucide-react';
+import { formatCurrency, formatDate, formatTime } from '@/lib/utils';
 
 interface CreateChallengeModalProps {
   isOpen: boolean;
@@ -20,11 +20,10 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({
   const [selectedVenueId, setSelectedVenueId] = useState(venues[0]?.id || '');
   const [description, setDescription] = useState('');
 
-  if (!isOpen) return null;
-
   const currentVenue = venues.find((v) => v.id === selectedVenueId) || venues[0];
   const availableSlots = currentVenue?.slots.filter((s) => !s.isBooked) || [];
   const [selectedSlotId, setSelectedSlotId] = useState(availableSlots[0]?.id || '');
+  if (!isOpen) return null;
 
   const activeSlot = currentVenue?.slots.find((s) => s.id === selectedSlotId) || availableSlots[0];
 

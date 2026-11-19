@@ -4,30 +4,24 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppState } from '@/context/AppStateContext';
-import { UserRole } from '@/types';
 import { officialEvent } from '@/lib/officialEvent';
 import {
   Trophy,
-  MapPin,
   Swords,
   BarChart3,
-  ShieldCheck,
-  ChevronDown,
   Menu,
   X,
   Flame,
-  LayoutDashboard,
   Sun,
   Moon,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
-  const { currentUser, switchUserRole, theme, toggleTheme } = useAppState();
-  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useAppState();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isDemo = ['/challenges', '/leaderboards', '/profile', '/admin', '/venues'].some(
+  const isDemo = ['/challenges', '/leaderboards', '/demo', '/admin', '/venues'].some(
     base => pathname === base || pathname.startsWith(`${base}/`)
   );
   const navLinks = [
@@ -36,30 +30,6 @@ export const Navbar: React.FC = () => {
     { href: '/leaderboards', label: 'Рейтинги', icon: BarChart3 },
     { href: officialEvent.href, label: 'Официальный матч' },
     { href: '/profile', label: 'Профиль', icon: Trophy },
-    ...(isDemo && currentUser.role === 'SUPER_ADMIN'
-      ? [{ href: '/admin', label: 'Панель Админа', icon: LayoutDashboard }]
-      : []),
-  ];
-
-  const roles: { role: UserRole; label: string; desc: string; icon: typeof Trophy }[] = [
-    {
-      role: 'STUDENT_CAPTAIN',
-      label: 'Студент-Капитан',
-      desc: 'Сардор (TEAM University)',
-      icon: Trophy,
-    },
-    {
-      role: 'VENUE_MANAGER',
-      label: 'Менеджер площадок',
-      desc: 'Джамшид (Динамо & TEAM Hub)',
-      icon: MapPin,
-    },
-    {
-      role: 'SUPER_ADMIN',
-      label: 'Супер-Администратор',
-      desc: 'Дильноза (Комиссар Лиги)',
-      icon: ShieldCheck,
-    },
   ];
 
   return (
@@ -121,83 +91,6 @@ export const Navbar: React.FC = () => {
             )}
           </button>
 
-          {/* Quick Role Switcher Pill */}
-          {isDemo && <div className="relative">
-            <button
-              onClick={() => setRoleMenuOpen(!roleMenuOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-700/80 hover:border-amber-500/50 text-xs font-medium text-neutral-300 hover:text-white transition-all shadow-inner"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-               <span className="text-neutral-400">Демо-роль:</span>
-              <span className="text-amber-400 font-bold">
-                {currentUser.role === 'STUDENT_CAPTAIN'
-                  ? 'Капитан'
-                  : currentUser.role === 'VENUE_MANAGER'
-                  ? 'Менеджер'
-                  : 'Админ'}
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-            </button>
-
-            {roleMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-3 py-2 text-[10px] font-bold tracking-wider text-neutral-400 uppercase border-b border-neutral-800 mb-1">
-                  Переключить Роль
-                </div>
-                {roles.map((item) => {
-                  const ItemIcon = item.icon;
-                  const isSelected = currentUser.role === item.role;
-                  return (
-                    <button
-                      key={item.role}
-                      onClick={() => {
-                        switchUserRole(item.role);
-                        setRoleMenuOpen(false);
-                      }}
-                      className={`w-full text-left p-2.5 rounded-xl flex items-start gap-3 transition-colors ${
-                        isSelected
-                          ? 'bg-amber-500/10 border border-amber-500/30 text-white'
-                          : 'hover:bg-neutral-800 text-neutral-300'
-                      }`}
-                    >
-                      <div
-                        className={`p-1.5 rounded-lg ${
-                          isSelected ? 'bg-amber-500 text-neutral-950 font-bold' : 'bg-neutral-800 text-neutral-400'
-                        }`}
-                      >
-                        <ItemIcon className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold flex items-center gap-1.5">
-                          {item.label}
-                          {isSelected && <span className="text-[10px] text-amber-400 font-bold">✓</span>}
-                        </div>
-                        <div className="text-[11px] text-neutral-400">{item.desc}</div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>}
-
-          {/* User Profile Mini Badge */}
-          {isDemo && <Link
-            href="/profile"
-            className="flex items-center gap-2 pl-2 py-1 pr-1 rounded-xl hover:bg-neutral-900 transition-colors"
-          >
-            <div className="text-right hidden lg:block">
-              <div className="text-xs font-bold text-white leading-tight">{currentUser.fullName}</div>
-              <div className="text-[10px] text-amber-400 font-semibold leading-tight">
-                {currentUser.universityName || 'Администрация Лиги'}
-              </div>
-            </div>
-            <img
-              src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-              alt={currentUser.fullName}
-              className="w-8 h-8 rounded-xl object-cover border border-amber-500/40"
-            />
-          </Link>}
         </div>
 
         {/* Mobile Hamburger Toggle & Theme */}
@@ -243,27 +136,6 @@ export const Navbar: React.FC = () => {
               </Link>
             );
           })}
-          {isDemo && <div className="pt-4 border-t border-neutral-800 flex flex-col gap-2">
-            <span className="text-xs text-neutral-400">Демонстрационная роль:</span>
-            <div className="grid grid-cols-3 gap-2">
-              {roles.map((r) => (
-                <button
-                  key={r.role}
-                  onClick={() => {
-                    switchUserRole(r.role);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`text-xs py-2 px-1 rounded-xl text-center font-bold border ${
-                    currentUser.role === r.role
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-400'
-                      : 'border-neutral-800 text-neutral-400'
-                  }`}
-                >
-                  {r.label.split(' ')[0]}
-                </button>
-              ))}
-            </div>
-          </div>}
         </nav>
       )}
     </header>
@@ -272,6 +144,7 @@ export const Navbar: React.FC = () => {
         <strong className="text-amber-400">Демонстрационные данные.</strong>{' '}
         Команды, результаты, отзывы, партнёрские отметки и слоты — примеры. Реальных бронирований, платежей и возвратов нет.{' '}
         <Link href={officialEvent.href} className="font-bold underline">К согласованному матчу</Link>
+        {' · '}<Link href="/demo/profile" className="underline">Демо-профиль команды</Link>
       </aside>
     )}
     </>

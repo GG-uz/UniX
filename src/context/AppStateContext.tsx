@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Team, Venue, Match, Slot, UserRole, SportType } from '@/types';
+import { User, Team, Venue, Match, SportType } from '@/types';
 import { MOCK_USERS, MOCK_TEAMS, MOCK_VENUES, MOCK_MATCHES } from '@/lib/mockData';
 import { formatCurrency } from '@/lib/utils';
 
@@ -18,7 +18,6 @@ interface BookingConfirmationParams {
 
 interface AppStateContextType {
   currentUser: User;
-  switchUserRole: (role: UserRole) => void;
   teams: Team[];
   venues: Venue[];
   matches: Match[];
@@ -47,7 +46,7 @@ interface AppStateContextType {
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
 
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]); // Сардор Рахимов, TEAM University
+  const currentUser = MOCK_USERS[0]; // Demo participant; never used for authorization.
   const [teams, setTeams] = useState<Team[]>(MOCK_TEAMS);
   const [venues, setVenues] = useState<Venue[]>(MOCK_VENUES);
   const [matches, setMatches] = useState<Match[]>(MOCK_MATCHES);
@@ -88,20 +87,6 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return () => clearTimeout(timer);
     }
   }, [toastMessage]);
-
-  const switchUserRole = (role: UserRole) => {
-    const found = MOCK_USERS.find((u) => u.role === role);
-    if (found) {
-      setCurrentUser(found);
-      const roleNameRu =
-        role === 'STUDENT_CAPTAIN'
-          ? 'Капитан команды'
-          : role === 'VENUE_MANAGER'
-          ? 'Менеджер площадки'
-          : 'Супер-Администратор';
-      showToast(`Переключена роль: ${roleNameRu} (${found.fullName})`);
-    }
-  };
 
   const userTeam = teams.find((t) => t.captainId === currentUser.id) || teams[0];
 
@@ -383,7 +368,6 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     <AppStateContext.Provider
       value={{
         currentUser,
-        switchUserRole,
         teams,
         venues,
         matches,

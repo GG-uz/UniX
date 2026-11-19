@@ -30,7 +30,7 @@ export const SlotGrid: React.FC<SlotGridProps> = ({ venue }) => {
     setModalOpen(true);
   };
 
-  const handleConfirm = (params: any) => {
+  const handleConfirm: React.ComponentProps<typeof CancellationModal>['onConfirm'] = (params) => {
     if (!selectedSlot) return;
 
     bookSlotAndCreateMatch({

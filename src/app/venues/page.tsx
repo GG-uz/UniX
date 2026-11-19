@@ -33,7 +33,7 @@ function VenuesContent() {
       venue.city.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesSport =
-      selectedSport === 'ALL' || venue.sportTypes.includes(selectedSport as any);
+      selectedSport === 'ALL' || venue.sportTypes.some(type => type === selectedSport);
 
     const matchesSurface =
       selectedSurface === 'ALL' || venue.surfaceType.toLowerCase().includes(selectedSurface.toLowerCase());

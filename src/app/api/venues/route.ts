@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   let venues = [...MOCK_VENUES];
 
   if (sport && sport !== 'ALL') {
-    venues = venues.filter((v) => v.sportTypes.includes(sport as any));
+    venues = venues.filter((v) => v.sportTypes.some(type => type === sport));
   }
 
   if (featured === 'true') {

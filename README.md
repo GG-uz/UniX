@@ -2,8 +2,6 @@
 
 Inter-University Sports Matchmaking & Venue Booking Platform built with **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS**, and **Lucide Icons**.
 
-Located at: `D:\Antigravity\unisport-league`
-
 ---
 
 ## 🚀 Key Features Built
@@ -40,8 +38,7 @@ Located at: `D:\Antigravity\unisport-league`
    - Official collegiate standings table sorted by total points ($3\text{ pts}$ win, $1\text{ pt}$ draw, $0\text{ pts}$ loss).
    - Spotlight podium cards for #1 Gold, #2 Silver, #3 Bronze ranks.
    - Recent match form pills (`W`, `D`, `L`), win rates, and university faculty tags.
-   - **Role Persona Switcher in Navbar**: Instantly toggle between **Student Captain** (Alexey Morozov), **Venue Manager** (Dmitry Smirnov), and **Super Admin** (Elena Rostova).
-   - Profile management with active bookings, live cancellation test, and Venue Manager Revenue Dashboard.
+    - `/demo/profile` shows the example team's bookings and standings; `/profile` is a private student account.
 
 6. **Database Schemas & API Endpoints**:
    - `prisma/schema.prisma`: Full relational Prisma schema with enums (`UserRole`, `SportType`, `MatchStatus`, `PaymentStatus`).
@@ -65,24 +62,31 @@ Located at: `D:\Antigravity\unisport-league`
 
 ---
 
-## 🔌 Supabase & Production Database Integration
+## Подключение студенческих аккаунтов
 
-To connect to a live Supabase PostgreSQL database:
-
-1. Create a new project in the [Supabase Dashboard](https://supabase.com).
-2. Open the **SQL Editor** in your Supabase dashboard and run the complete DDL script located at:
-   `supabase/schema.sql`
-3. Copy your project URL and service role keys into `.env.local`:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   DATABASE_URL=postgresql://postgres:[PASSWORD]@db.your-project.supabase.co:5432/postgres
-   ```
-4. Push the Prisma schema:
-   ```bash
-   npx prisma db push
-   ```
+1. Используйте отдельный Supabase-проект UniX. В SQL Editor вручную выполните по порядку
+   `supabase/migrations/0001_universities.sql`, `0002_profiles.sql`, `0003_on_signup.sql`.
+   Для авторизации **не** запускайте `supabase/schema.sql` или `prisma db push`: это старые схемы демо-домена.
+   Триггер требует имя и существующий вуз при каждой новой регистрации. Он не создаёт профили задним числом.
+2. В **Authentication → Sign In / Providers** включите Email и подтверждение почты, отключите анонимную регистрацию.
+   Установите минимальную длину пароля 12 также в настройках провайдера.
+   В **URL Configuration → Site URL** укажите полный адрес `/auth/callback` вашего сайта
+   (для локального `next dev`: `http://localhost:3000/auth/callback`, для production — HTTPS).
+   Это фиксированный адрес возврата PKCE. Используйте стандартный шаблон письма со ссылкой `{{ .ConfirmationURL }}`.
+   В production подключите SMTP для доставки писем студентам.
+3. Скопируйте `.env.example` в `.env.local`. В **Connect / Settings → API Keys** возьмите
+   Project URL (`NEXT_PUBLIC_SUPABASE_URL`) и **publishable** или legacy **anon** key
+   (`NEXT_PUBLIC_SUPABASE_ANON_KEY`). Secret/service-role и пароль PostgreSQL приложению не нужны.
+   Перезапустите приложение; для production задайте переменные до сборки и запуска.
+4. `/auth/register` создаёт студента; подтверждение откройте в том же браузере.
+   `/profile` показывает сохранённые данные; выбранный вуз не подтверждает факт обучения.
+   Повышение роли выполняет только уполномоченный администратор БД по проверенному UUID аккаунта
+   в `public.profiles`, не через пользовательские метаданные или веб-интерфейс.
+   Организатор (`VENUE_MANAGER`) получает `/organizer`; `/admin` доступен только `SUPER_ADMIN`.
+   Платежи, бронирования, рейтинги и действия модератора остаются демонстрационными.
+5. При приёмке проверьте регистрацию/подтверждение, повторный вход, выход, запрет чтения
+   чужого профиля и изменения роли клиентом, прямые переходы на `/admin` и `/organizer`
+   для гостя, студента и отдельно назначенных ролей. Не кэшируйте auth-ответы на CDN.
 
 ---
 
@@ -91,8 +95,6 @@ To connect to a live Supabase PostgreSQL database:
 In your terminal:
 
 ```bash
-cd D:\Antigravity\unisport-league
-
 # Start development server (runs with --webpack on Windows)
 npm.cmd run dev
 
