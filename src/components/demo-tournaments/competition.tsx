@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import s from '@/components/ecosystem/Atlas.module.css';
 import css from './competition.module.css';
-import { change,groups,pool,standings,type Match,type Tournament } from './model';
+import { change,groups,isConfirmed,pool,standings,type Match,type Tournament } from './model';
 import type { Controls } from './TournamentDetail';
 
 type Props=Controls & {games:Match[]};
@@ -15,8 +15,10 @@ function ScoreEditor({t,m,send}:Controls & {m:Match}) {
   const [tie,setTie]=useState(m.score?.tie??''),[confirmed,setConfirmed]=useState(false);
   const a=Number(left),b=Number(right),draw=t.system==='knockout'&&left!==''&&right!==''&&a===b;
   const action={type:'score' as const,id:m.id,score:{a,b,tie:draw&&tie?tie:undefined}};
-  const next=change(t,action);
+  const ready=left!==''&&right!=='';
+  const next=ready?change(t,action):t;
   const resets=Object.keys(t.scores).filter(id=>!next.scores[id]).length;
+  const stale=ready&&!!t.confirmed&&!isConfirmed(next);
   return <details className={css.editor}><summary>{m.score?'Исправить результат':'Внести результат'}</summary>
     <form className={s.stack} onSubmit={e=>{
       e.preventDefault();if(left!==''&&right!==''&&(!resets||confirmed))send(action);
@@ -31,6 +33,7 @@ function ScoreEditor({t,m,send}:Controls & {m:Match}) {
         <option value="">Не определён — не продвигать</option>{[m.a!,m.b!].map(id=><option key={id} value={id}>{name(t,id)}</option>)}</select></label>}
       {resets>0&&<label className={css.warn}><input type="checkbox" required checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>
         {' '}Смена победителя сбросит зависимые результаты: {resets}. Подтверждаю.</label>}
+      {resets===0&&stale&&<p className={css.warn} role="note">Изменение затрагивает места и снимет подтверждение итогов. После сохранения потребуется повторное подтверждение.</p>}
       <button className={s.primary} disabled={!!resets&&!confirmed}>Сохранить счёт</button>
     </form>
   </details>;

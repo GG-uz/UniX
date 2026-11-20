@@ -1,0 +1,86 @@
+.tabs { display:flex; flex-wrap:wrap; gap:.5rem; }
+.tabs > button { min-height:2.75rem; }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr)); gap:.7rem; }
+.stat { background:var(--card); border:1px solid var(--line); border-top:3px solid var(--signal); padding:.9rem; min-width:0; }
+.stat b { display:block; font:700 1.6rem/1.1 Georgia,serif; }
+.stat small { color:var(--muted); display:block; margin-top:.3rem; }
+.pending { padding:.75rem 1rem; border-left:3px solid var(--signal); background:var(--card); }
+.filters { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr)); gap:.75rem; align-items:end; }
+.check { display:flex; align-items:center; gap:.5rem; min-height:2.75rem; }
+.check input { accent-color:var(--signal); }
+.board { display:grid; gap:.55rem; }
+.row { background:var(--card); border:1px solid var(--line); }
+.row > summary { list-style:none; cursor:pointer; display:grid; grid-template-columns:2.5rem minmax(0,1fr) repeat(4,minmax(3.7rem,auto)); gap:.55rem; align-items:center; padding:.75rem 1rem; }
+.row > summary::-webkit-details-marker { display:none; }
+.row[open] > summary { border-bottom:1px solid var(--line); }
+.rank { display:inline-grid; place-items:center; width:2.2rem; height:2.2rem; border:1px solid var(--line); border-radius:50%; font-weight:800; }
+.row:nth-child(1) .rank { background:var(--amber); color:#171c22; border-color:var(--amber); }
+.who { min-width:0; }
+.who b { display:block; overflow-wrap:anywhere; }
+.who small { display:block; color:var(--muted); margin-top:.15rem; }
+.metric { text-align:right; white-space:nowrap; }
+.metric b { display:block; font-size:1.05rem; }
+.metric small { display:block; color:var(--muted); font-size:.68rem; text-transform:uppercase; letter-spacing:.04em; }
+.breakdown { padding:.8rem 1rem 1rem; }
+.breakdown > * + * { margin-top:.6rem; }
+.formula { color:var(--muted); font-size:.85rem; }
+.result { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:.4rem .9rem; align-items:baseline; border-top:1px solid var(--line); padding-top:.55rem; font-size:.88rem; }
+.result > span { min-width:0; overflow-wrap:anywhere; }
+.result small { display:block; color:var(--muted); }
+.excluded { border-top:1px dashed var(--line); padding-top:.55rem; font-size:.82rem; color:var(--muted); }
+.excluded ul { margin:.35rem 0 0; padding-left:1.1rem; }
+.excluded li + li { margin-top:.2rem; }
+.badge { display:inline-block; padding:.15rem .45rem; border:1px solid var(--line); font-size:.72rem; font-weight:700; white-space:nowrap; }
+.badgeOk { color:var(--signal); border-color:var(--signal); }
+.badgePending { color:var(--muted); }
+.tableWrap { overflow-x:auto; background:var(--card); border:1px solid var(--line); }
+.table { width:100%; min-width:48rem; border-collapse:collapse; font-size:.82rem; }
+.table caption { text-align:left; padding:.6rem .8rem; color:var(--muted); }
+.table :is(th,td) { text-align:left; padding:.55rem .6rem; border-bottom:1px solid var(--line); vertical-align:top; }
+.table thead th { font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+.table tbody tr:last-child :is(th,td) { border-bottom:0; }
+.method { background:var(--card); border:1px solid var(--line); padding:clamp(1rem,2vw,1.5rem); }
+.method h2 { font-family:Georgia,serif; }
+.method h3 { margin-top:1rem; }
+.method p, .method li { line-height:1.55; }
+.method ul, .method ol { padding-left:1.25rem; }
+.method li + li { margin-top:.25rem; }
+.formulaCode { display:block; padding:.6rem .8rem; background:var(--paper); border-left:3px solid var(--signal); overflow-wrap:anywhere; font-family:ui-monospace,monospace; }
+.methodTables { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap:.8rem; margin-top:.8rem; }
+.methodTable { width:100%; border-collapse:collapse; font-size:.82rem; }
+.methodTable :is(th,td) { text-align:left; padding:.35rem .4rem; border-bottom:1px solid var(--line); }
+.empty { padding:1rem; border:1px dashed var(--line); color:var(--muted); }
+.muted { color:var(--muted); }
+.detailTitle { font-size:.95rem; margin-top:.3rem; }
+.unranked { color:var(--signal); font-weight:700; }
+.disciplineList { display:grid; gap:.35rem; }
+.discipline { display:flex; justify-content:space-between; align-items:baseline; gap:.75rem; border-top:1px solid var(--line); padding-top:.4rem; font-size:.88rem; }
+.discipline > span { min-width:0; overflow-wrap:anywhere; }
+.discipline small { display:block; color:var(--muted); }
+.matchList { display:grid; gap:.45rem; }
+.match { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto auto; gap:.45rem .9rem; align-items:baseline; border-top:1px solid var(--line); padding-top:.5rem; font-size:.84rem; }
+.match > span { min-width:0; overflow-wrap:anywhere; }
+.match small { display:block; color:var(--muted); }
+.deltaUp { color:var(--signal); }
+.deltaDown { color:#b3352a; }
+.weight { white-space:nowrap; color:var(--muted); }
+.achievementList { display:grid; gap:.4rem; }
+.achievementResult { display:flex; justify-content:space-between; align-items:baseline; gap:.75rem; border-top:1px solid var(--line); padding-top:.45rem; font-size:.85rem; }
+.achievementResult > span { min-width:0; overflow-wrap:anywhere; }
+.achievementResult small { display:block; color:var(--muted); }
+.eloCell { display:flex; justify-content:space-between; gap:.75rem; white-space:nowrap; }
+.eloCell + .eloCell { margin-top:.25rem; }
+@media(prefers-color-scheme:dark) { .deltaDown { color:#ff9b8f; } }
+@media(max-width:640px) {
+  .row > summary { grid-template-columns:2.5rem minmax(0,1fr) repeat(2,minmax(3.3rem,auto)); }
+  .row > summary { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .who { grid-column:span 3; }
+  .metric { text-align:left; }
+  .result { grid-template-columns:1fr; gap:.2rem; }
+  .result > span:not(:first-child) { color:var(--muted); }
+  .match { grid-template-columns:1fr auto; }
+  .match > span:nth-child(2) { grid-column:1; color:var(--muted); }
+  .achievementResult { flex-direction:column; gap:.15rem; }
+  .discipline { flex-wrap:wrap; }
+  .eloCell { white-space:normal; flex-wrap:wrap; gap:.15rem .5rem; }
+}

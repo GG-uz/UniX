@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Hero } from '@/components/ecosystem/Atlas';
 import s from '@/components/ecosystem/Atlas.module.css';
 import { useTournaments } from './Store';
-import { approved,formatNames,matches,phase,pool,registrationOpen,systemNames,type Action,type Tournament } from './model';
+import { approved,formatNames,isConfirmed,matches,phase,pool,registrationOpen,systemNames,type Action,type Tournament } from './model';
 import { Arena,Schedule } from './competition';
 
 export type Controls={t:Tournament;send:(a:Action)=>void};
@@ -32,6 +32,19 @@ function Applications({t,send}:Controls){
       <button className={s.primary} disabled={approved(t)<2} onClick={()=>send({type:'close'})}>Закрыть регистрацию и сформировать {t.system==='knockout'?'сетку':'группы'}</button></>}
   </section>;
 }
+function ResultsStatus({t,send}:Controls){
+  if(!matches(t).length)return null;
+  const complete=phase(t)==='Завершён',confirmed=isConfirmed(t),stale=!!t.confirmed&&!confirmed;
+  return <section className={`${s.section} ${s.stack}`} data-results-status>
+    <p className={s.eyebrow}>Демо-рейтинг</p><h2>Итоги и подтверждение</h2>
+    {confirmed?<p role="status">Итоги подтверждены. Турнир участвует в демо-рейтинге.</p>:
+      complete?<>
+        <p>{stale?'Результаты изменились: турнир исключён из рейтинга до повторного подтверждения.':'Итоги не подтверждены и не влияют на рейтинг.'}</p>
+        <button className={s.primary} onClick={()=>send({type:'confirm'})}>{stale?'Подтвердить заново':'Подтвердить итоги'}</button>
+      </>:<p>Подтверждение станет доступно после завершения всех матчей. Незавершённая сетка или ничья без тай-брейка не подтверждаются.</p>}
+    <Link className={s.textLink} href="/demo/rankings">Открыть демо-рейтинг →</Link>
+  </section>;
+}
 export function TournamentDetail({id}:{id:string}){
   const {list,dispatch}=useTournaments();const t=list.find(v=>v.id===id);
   const [tab,setTab]=useState<'overview'|'games'|'schedule'>('overview');
@@ -39,13 +52,14 @@ export function TournamentDetail({id}:{id:string}){
   const send=(action:Action)=>{dispatch({type:'edit',id,action});if(action.type==='close')setTab('games');};
   const games=matches(t),result=phase(t);
   return <>
-    <Hero tag={`Турнирная карточка / ${result}`} title={t.title}>{t.description}</Hero>
+    <Hero tag={`Турнирная карточка / ${result}${isConfirmed(t)?' · подтверждён':''}`} title={t.title}>{t.description}</Hero>
     <div className={s.cover}><div><p className={s.eyebrow}>Учебная дата · {t.today}</p><b>{t.organizer}</b></div>
       <div><b>{t.discipline} · {formatNames[t.format]}</b><p>{systemNames[t.system]} · {t.start} — {t.end}</p></div></div>
     <nav className={s.actions} aria-label="Разделы турнира">{([['overview','Заявки'],['games',t.system==='knockout'?'Сетка и результаты':'Группы и результаты'],['schedule','Расписание']] as const)
       .map(([k,label])=><button key={k} className={tab===k?s.primary:s.secondary} aria-pressed={tab===k} onClick={()=>setTab(k)}>{label}</button>)}</nav>
     {tab==='overview'?<Applications t={t} send={send}/>:!games.length?<p role="status">После закрытия регистрации здесь появятся раунды и матчи.</p>:
       tab==='games'?<Arena t={t} games={games} send={send}/>:<Schedule t={t} games={games} send={send}/>}
+    {tab!=='overview'&&games.length>0&&<ResultsStatus t={t} send={send}/>}
     <Link href="/demo/tournaments" className={s.textLink}>← Все турниры</Link>
   </>;
 }

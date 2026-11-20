@@ -1,7 +1,7 @@
 // Pure simulation. Identifiers, dates and results belong only to this lab.
 export const day = '2027-03-01';
 export const campuses = ['Академия «Орион»','Институт «Спектр»','Университет «Вектор»'];
-export const disciplines = ['Футбол','Шахматы','Математика','IT-хакатон','Бизнес-кейс','Другая дисциплина'];
+export const disciplines = ['Футбол','Шахматы','Математика','IT-хакатон','Бизнес-кейс','Образование','Другая дисциплина'];
 export type Format = 'TEAM' | 'INDIVIDUAL';
 export type System = 'knockout' | 'groups';
 export const formatNames = {TEAM:'Команды', INDIVIDUAL:'Студенты'};
@@ -28,7 +28,7 @@ export function validate(c:Config):string {
 export type Application = {id:string;status:'pending'|'approved'|'rejected'};
 export type Score = {a:number;b:number;tie?:string};
 export type Slot = {date:string;time:string;venue:string};
-export type Tournament = Config & {id:string;today:string;apps:Application[];entrants:string[];scores:Record<string,Score>;slots:Record<string,Slot>};
+export type Tournament = Config & {id:string;today:string;apps:Application[];entrants:string[];scores:Record<string,Score>;slots:Record<string,Slot>;confirmed?:string;corrections?:string[]};
 export type Match = {id:string;round:number;group:number;a:string|null;b:string|null;bye:boolean;winner:string|null;score?:Score};
 export function create(id:string,c:Config):Tournament {
   if(validate(c)) throw new Error(validate(c));
@@ -83,15 +83,77 @@ export function phase(t:Tournament) {
   const games=matches(t);
   return games.every(m=>m.bye||(t.system==='groups'?!!m.score:!!m.winner))?'Завершён':'Идёт';
 }
+export type Place = {id:string;rank:number;positions:number[]};
+// Placement groups share every occupied position, so a tie averages its base points.
+export function places(t:Tournament):Place[] {
+  if(phase(t)!=='Завершён')return [];
+  const games=matches(t);
+  if(t.system==='groups') {
+    const list:Place[]=[];
+    for(const ids of groups(t.entrants)) {
+      const rows=standings(ids,games),byRank=new Map<number,typeof rows>();
+      for(const row of rows)byRank.set(row.rank,[...(byRank.get(row.rank)??[]),row]);
+      let next=1;
+      for(const [,tied] of [...byRank].sort((a,b)=>a[0]-b[0])) {
+        const positions=tied.map((_,i)=>next+i);
+        for(const row of tied)list.push({id:row.id,rank:next,positions});
+        next+=tied.length;
+      }
+    }
+    return list;
+  }
+  const rounds=Math.max(...games.map(m=>m.round)),final=games[games.length-1];
+  if(!final?.winner)return [];
+  const list:Place[]=[{id:final.winner,rank:1,positions:[1]}];
+  const runner=final.a===final.winner?final.b:final.a;
+  if(runner)list.push({id:runner,rank:2,positions:[2]});
+  for(let r=1;r<rounds;r++) {
+    const losers=games.filter(m=>m.round===r&&!m.bye&&m.a&&m.b&&m.winner)
+      .map(m=>m.a===m.winner?m.b!:m.a!);
+    const start=2**(rounds-r)+1,positions=losers.map((_,i)=>start+i);
+    // BYE never creates a placement: only actual losers share the occupied positions.
+    for(const id of losers)list.push({id,rank:start,positions});
+  }
+  return list.sort((a,b)=>a.rank-b.rank||a.id.localeCompare(b.id));
+}
+export function matchMoment(t:Tournament,m:Match) {
+  const slot=t.slots[m.id];
+  return `${slot?.date||t.start}T${slot?.time||'00:00'}`;
+}
+export function signature(t:Tournament) {
+  const rows=places(t);
+  if(!rows.length)return '';
+  // Outcomes, not raw scores: a 2:0 -> 3:0 edit keeps confirmation, a flipped result does not.
+  const campusesById=new Map(pool(t.format).map(p=>[p.id,p.university]));
+  const outcomes=matches(t).filter(m=>!m.bye&&m.a&&m.b)
+    .map(m=>[m.id,matchMoment(t,m),m.a,campusesById.get(m.a!),m.b,campusesById.get(m.b!),m.winner]);
+  return [t.discipline,t.format,t.entrants.length,[...t.entrants].sort().join(','),
+    [...rows].sort((a,b)=>a.id.localeCompare(b.id)).map(p=>`${p.id}:${p.positions.join('.')}`).join(';'),
+    JSON.stringify(outcomes)].join('|');
+}
+export function isConfirmed(t:Tournament) {
+  return !!t.confirmed&&t.confirmed===signature(t);
+}
 export type Action =
-  | {type:'open'|'close'}
+  | {type:'open'|'close'|'confirm'}
   | {type:'apply'|'approve'|'reject';participant:string}
   | {type:'score';id:string;score:Score}
   | {type:'slot';id:string;slot:Slot};
 
 // Invalid and repeated transitions have no effect, including stale UI clicks.
 export function change(t:Tournament,action:Action):Tournament {
+  const next=transition(t,action);
+  if(next===t||!t.confirmed)return next;
+  if(action.type==='confirm')return {...next,corrections:[...(t.corrections??[]),'Итоги подтверждены повторно; хронология пересчитана.']};
+  if(isConfirmed(t)&&!isConfirmed(next)&&'id' in action) {
+    const reason=action.type==='score'?`Счёт матча ${action.id}: ${t.scores[action.id]?.a}:${t.scores[action.id]?.b} → ${action.score.a}:${action.score.b}`:`Изменено расписание матча ${action.id}`;
+    return {...next,confirmed:'stale',corrections:[...(t.corrections??[]),`${reason}. Турнир исключён до подтверждения.`]};
+  }
+  return next;
+}
+function transition(t:Tournament,action:Action):Tournament {
   if(action.type==='open')return !t.entrants.length&&t.today<t.regStart?{...t,today:t.regStart}:t;
+  if(action.type==='confirm')return phase(t)==='Завершён'&&!isConfirmed(t)?{...t,confirmed:signature(t)}:t;
   if(action.type==='close'){
     if(!registrationOpen(t)||approved(t)<2)return t;
     return {...t,today:t.start,entrants:t.apps.filter(a=>a.status==='approved').map(a=>a.id),

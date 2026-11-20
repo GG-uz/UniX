@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { LeaderboardTable } from '@/components/leaderboards/LeaderboardTable';
 import { Trophy } from 'lucide-react';
 
@@ -20,6 +21,7 @@ export default function LeaderboardsPage() {
           <p className="text-sm text-neutral-400 mt-1 max-w-2xl">
             Сводная таблица по результатам спортивных дерби, олимпиадных матбоев, хакатонов и кейс-чемпионатов среди университетов Ташкента (TEAM University, WIUT, Inha, MDIST, Amity, ТУИТ).
           </p>
+          <Link href="/demo/rankings" className="text-sm text-amber-400 underline">Открыть демо-рейтинг Elo →</Link>
         </div>
 
         {/* Top 3 Spotlight Podium Cards */}
