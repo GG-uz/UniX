@@ -1,0 +1,7 @@
+.table { width:100%; border-collapse:collapse; font-size:clamp(.78rem,2vw,1rem); }
+.table caption { text-align:left; padding-block:.5rem; color:var(--muted); }
+.table :is(th,td) { text-align:left; overflow-wrap:anywhere; padding:.55rem .22rem; border-bottom:1px solid var(--line); }
+.scoreFields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; }
+.editor summary { min-height:2.75rem; padding:.6rem 0; cursor:pointer; text-decoration:underline; text-underline-offset:.22em; }
+.editor form { padding-bottom:.5rem; }
+.warn { display:block; padding:.65rem; border-left:3px solid var(--signal); }
