@@ -20,6 +20,7 @@ export default function UniversityChallengesDemo() {
         </header>
         <Scenario />
         <nav aria-label="Другие разделы соревнований" className={styles.links}>
+          <Link href="/demo/teams" prefetch={false}>Демо-команды и составы →</Link>
           <Link href="/demo/challenges" prefetch={false}>Демо-доска матчей и бронирований →</Link>
           <Link href="/challenges" prefetch={false}>Реальный каталог вызовов →</Link>
         </nav>

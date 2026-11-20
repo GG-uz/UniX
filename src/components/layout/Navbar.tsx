@@ -27,6 +27,7 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { href: '/', label: 'Главная' },
     { href: '/challenges', label: 'Соревнования', icon: Swords },
+    { href: '/universities', label: 'Университеты' },
     { href: '/leaderboards', label: 'Рейтинги', icon: BarChart3 },
     { href: officialEvent.href, label: 'Официальный матч' },
     { href: '/profile', label: 'Профиль', icon: Trophy },
