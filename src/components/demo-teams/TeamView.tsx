@@ -6,11 +6,13 @@ import s from '@/components/ecosystem/Atlas.module.css';
 import { statuses } from './model';
 import { useTeams } from './Store';
 import { ProposalForm } from './ProposalForm';
+import { EventContext } from '../demo-notifications/EventContext';
 
 export function TeamView({id,roster=false}:{id:string;roster?:boolean}) {
   const {teams,dispatch}=useTeams(),team=teams.find(t=>t.id===id);
   const [reason,setReason]=useState('');
   if(!team)return <section className={s.section}><h1>Демо-команда не найдена</h1>
+    <EventContext available={{}}/>
     <p>После обновления страницы созданные заявки сбрасываются.</p><Link className={s.textLink} href="/demo/teams">В каталог демокоманд</Link></section>;
   const base=`/demo/teams/${team.id}`,approved=team.status==='verified';
   if(roster)return <>
@@ -22,6 +24,7 @@ export function TeamView({id,roster=false}:{id:string;roster?:boolean}) {
   </>;
   return <>
     <div className={s.cover}><Mark name={team.name}/><span role="status" className={s.chip}>{statuses[team.status]}</span></div>
+    <EventContext available={{captain:approved&&team.captain==='Комета',teamApproved:approved,teamRejected:team.status==='rejected'}}/>
     <Hero tag={`Демо-команда / ${team.discipline}`} title={team.name}>{team.university} · {approved?'Может представлять вымышленный вуз в демо.':'Права представлять вуз в демо ещё нет.'}</Hero>
     {team.status==='draft'&&<><h2>Подготовка заявки</h2><ProposalForm team={team}/></>}
     {team.status==='pending'&&<section className={s.section}><p className={s.eyebrow}>Шаг 02 / Решение демо-администрации</p>

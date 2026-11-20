@@ -10,7 +10,8 @@ export function Atlas({children,demo=false}:{children:ReactNode;demo?:boolean}) 
         <Link href="/universities" prefetch={false}>Университеты</Link>
         <Link href="/demo/teams" prefetch={false}>Демо-команды</Link>
         <Link href="/demo/tournaments" prefetch={false}>Демо-турниры</Link>
-        <Link href="/demo/rankings" prefetch={false}>Демо-рейтинги</Link>
+         <Link href="/demo/rankings" prefetch={false}>Демо-рейтинги</Link>
+         {demo&&<Link href="/demo/notifications">Демоуведомления</Link>}
         <Link href={demo?'/demo/university-challenges':'/challenges'} prefetch={false}>{demo?'Демо вызовов':'Вызовы'}</Link>
       </nav>
       {children}

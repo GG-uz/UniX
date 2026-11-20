@@ -1,0 +1,16 @@
+.center { display:grid; gap:1rem; }
+.surface { background:var(--card-bg); color:var(--foreground); border:1px solid var(--card-border); padding:1rem; overflow-wrap:anywhere; min-width:0; border-radius:.8rem; }
+.surface h2 { font-size:1.22rem; font-weight:750; margin:.3rem 0; }
+.surface p { margin:.5rem 0; }
+.surface button,.actions a { min-height:44px; padding:.5rem .7rem; border:1px solid currentColor; border-radius:.45rem; font-weight:600; cursor:pointer; }
+.surface button:disabled { opacity:.55; cursor:default; }
+.surface a { text-decoration:underline; text-underline-offset:3px; }
+.surface :is(button,a,select):focus-visible { outline:3px solid currentColor; outline-offset:2px; }
+.panel { position:absolute; top:100%; right:1rem; width:min(26rem,calc(100% - 2rem)); max-height:calc(100dvh - 4.5rem); overflow:auto; box-shadow:0 .5rem 1rem #0004; }
+.actions { display:flex; flex-wrap:wrap; align-items:end; gap:.6rem; margin:.65rem 0; }
+.actions label { min-width:0; max-width:100%; }
+.list { list-style:none; padding:0; }
+.list li { border-top:1px solid var(--card-border); padding:.65rem 0; }
+.list small { display:block; }
+.surface .subject { display:block; text-align:left; border:0; padding-left:0; text-decoration:underline; }
+.center section { scroll-margin-top:8rem; }

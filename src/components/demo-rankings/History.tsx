@@ -10,6 +10,8 @@ import {
   disciplineOptions,displayElo,eloMatches,resultHistory,summary,type EloMatch,
 } from './model';
 import { RankingStats } from './Stats';
+import {EventContext} from '../demo-notifications/EventContext';
+import {examples} from '../demo-notifications/model';
 
 const num=(value:number)=>Number.isInteger(value)?String(value):value.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
 const fmtElo=(value:number)=>Number.isInteger(displayElo(value))?String(displayElo(value)):displayElo(value).toFixed(1);
@@ -51,12 +53,15 @@ export function History() {
   const stats=useMemo(()=>summary(list),[list]);
   const disciplines=useMemo(()=>disciplineOptions(list),[list]);
   const search=query.trim().toLowerCase();
-  const games=useMemo(()=>eloMatches(list).filter(game=>
+  const ledger=useMemo(()=>eloMatches(list),[list]);
+  const entity=examples.elo.relatedEntity;
+  const linked=entity.kind==='match'?ledger.find(m=>m.key===`${entity.tournament}:${entity.id}`):undefined;
+  const games=useMemo(()=>ledger.filter(game=>
     (!discipline||game.discipline===discipline)&&(!format||game.format===format)&&
     (!university||game.aUniversity===university||game.bUniversity===university)&&
     (!search||[game.title,game.aName,game.bName,game.aUniversity,game.bUniversity,game.discipline]
       .some(value=>value.toLowerCase().includes(search)))
-  ),[list,discipline,format,university,search]);
+  ),[ledger,discipline,format,university,search]);
   const results=useMemo(()=>resultHistory(list).filter(result=>
     (!discipline||result.discipline===discipline)&&(!format||result.format===format)&&
     (!university||result.university===university)&&(!onlyConfirmed||result.confirmed)&&
@@ -70,6 +75,7 @@ export function History() {
     <Hero tag="Рейтинговая лаборатория / История" title="Elo, результаты и статистика">
       Журнал показывает, как каждый подтверждённый матч изменил Elo участников и вузов. Неподтверждённые турниры в Elo не входят; достижения B×K ведутся отдельно.
     </Hero>
+    <EventContext available={{elo:!!linked}} detail={linked&&<p>{linked.aName} — {linked.bName}, {linked.score}. Elo: {fmtElo(linked.eloA)} → {fmtElo(linked.afterA)} и {fmtElo(linked.eloB)} → {fmtElo(linked.afterB)}.</p>}/>
     <RankingStats stats={stats}/>
     <div className={css.tabs} aria-label="Вид истории">
       <button className={view==='elo'?s.primary:s.secondary} aria-pressed={view==='elo'} onClick={()=>setView('elo')}>История Elo</button>

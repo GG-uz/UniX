@@ -1,6 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { Suspense,useRef, useState } from 'react';
+import {useSearchParams} from 'next/navigation';
+import {EventContext} from '@/components/demo-notifications/EventContext';
 import styles from './scenario.module.css';
 
 const steps = ['Создание', 'Согласование', 'Заявки', 'Выбор соперника', 'Подтверждение'];
@@ -15,7 +17,19 @@ const fresh = (kind: Kind) => ({
 });
 
 export function Scenario() {
-  const [s, set] = useState(() => fresh('open'));
+  return <Suspense fallback={<p role="status">Загрузка сценария…</p>}><ScenarioEntry/></Suspense>;
+}
+function ScenarioEntry(){
+  const example=useSearchParams().get('example');
+  return <><EventContext available={{challengeNew:true,challengeAccepted:true}}/>
+    <Steps key={example??'default'} example={example}/></>;
+}
+function Steps({example}:{example:string|null}){
+  const [s, set] = useState(() => {
+    if(example==='challengeNew')return {...fresh('direct'),step:2};
+    if(example==='challengeAccepted')return {...fresh('direct'),step:4,requests:[candidates[0]],choice:candidates[0]};
+    return fresh('open');
+  });
   const heading = useRef<HTMLHeadingElement>(null);
   const direct = s.kind === 'direct';
   const eligible = direct ? [s.target] : candidates;
