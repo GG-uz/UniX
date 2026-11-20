@@ -7,7 +7,8 @@ export async function proxy(request: NextRequest) {
     status: 303, headers: { 'Cache-Control': 'private, no-store' },
   });
   const config = authConfig();
-  if (!config) return login();
+  const publicPage = request.nextUrl.pathname.replace(/\/$/, '') === '/challenges';
+  if (!config) return publicPage ? NextResponse.next() : login();
   let response = NextResponse.next({ request });
   const client = createServerClient(config.url, config.key, {
     cookieOptions,
@@ -21,7 +22,7 @@ export async function proxy(request: NextRequest) {
     },
   });
   const { data: { user } } = await client.auth.getUser();
-  if (!user?.email_confirmed_at) {
+  if (!publicPage && !user?.email_confirmed_at) {
     const denied = login();
     for (const cookie of response.cookies.getAll()) denied.cookies.set(cookie);
     return denied;
@@ -30,4 +31,4 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ['/profile/:path*', '/admin/:path*', '/organizer/:path*'] };
+export const config = { matcher: ['/profile/:path*', '/admin/:path*', '/organizer/:path*', '/challenges/:path*', '/university/dashboard/:path*'] };

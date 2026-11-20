@@ -1,149 +1,72 @@
-'use client';
+import Link from 'next/link';
+import { Frame, Notice, input, button, link, panel } from '@/components/university/Frame';
+import { viewer, directories, param, labels, represents, canAccept, entryName, type Challenge, type Query } from '@/lib/university/data';
+import { acceptChallenge } from '@/lib/university/actions';
 
-import React, { useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useAppState } from '@/context/AppStateContext';
-import { ChallengeCard } from '@/components/challenges/ChallengeCard';
-import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
-import { Swords, Plus } from 'lucide-react';
-import { DISCIPLINE_LIST } from '@/types';
-
-function ChallengesContent() {
-  const searchParams = useSearchParams();
-  const initialSport = searchParams.get('sport') || 'ALL';
-
-  const { matches } = useAppState();
-  const [selectedSport, setSelectedSport] = useState(initialSport);
-  const [date, setDate] = useState(searchParams.get('date') || '');
-  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'BOOKED' | 'COMPLETED'>('ALL');
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-
-  const filteredMatches = matches.filter((m) => {
-    const matchesSport = selectedSport === 'ALL' || m.sportType === selectedSport;
-    const matchesStatus = selectedStatus === 'ALL' || m.status === selectedStatus;
-    const matchesDate = !date || new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Tashkent', year: 'numeric', month: '2-digit', day: '2-digit',
-    }).format(new Date(m.scheduledDate)) === date;
-    return matchesSport && matchesStatus && matchesDate;
-  });
-
-  const openCount = matches.filter((m) => m.status === 'OPEN').length;
-
-  return (
-    <div className="py-12 bg-neutral-950 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider mb-2">
-              <Swords className="w-3.5 h-3.5" />
-              Межуниверситетский Матчмейкинг
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Доска Вызовов &amp; Лента Матчей
-            </h1>
-            <p className="text-sm text-neutral-400 mt-1 max-w-2xl">
-              Публикуйте открытые вызовы, принимайте соперников от других вузов (TEAM University, WIUT, Inha, MDIST, Amity, ТУИТ) и автоматически делите стоимость аренды пополам.
-            </p>
-          </div>
-
-          {/* Post Challenge CTA */}
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-neutral-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-orange-500/20 active:scale-95 transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Опубликовать Новый Вызов</span>
-          </button>
-        </div>
-
-        {/* Filter Controls */}
-        <div className="p-4 rounded-3xl bg-neutral-900 border border-neutral-800 flex flex-wrap items-center justify-between gap-3 mb-8 shadow-lg">
-          {/* Discipline Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-neutral-400">Направление:</span>
-            <select
-              value={selectedSport}
-              onChange={(e) => setSelectedSport(e.target.value)}
-              className="py-1.5 px-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-white focus:outline-none focus:border-amber-500 cursor-pointer"
-            >
-              <option value="ALL">Все дисциплины ({DISCIPLINE_LIST.length})</option>
-              {DISCIPLINE_LIST.map((d) => (
-                <option key={d.type} value={d.type}>
-                  {d.icon} {d.labelRu}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <label className="flex items-center gap-2 text-xs text-neutral-300">
-            Дата (Ташкент)
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2" />
-          </label>
-          {/* Status Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {([
-              { id: 'ALL', label: 'Все матчи' },
-              { id: 'OPEN', label: `Ждут соперника (${openCount})` },
-              { id: 'BOOKED', label: 'Подтвержденные' },
-              { id: 'COMPLETED', label: 'Завершенные' },
-            ] as const).map((st) => (
-              <button
-                key={st.id}
-                onClick={() => setSelectedStatus(st.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  selectedStatus === st.id
-                    ? 'bg-amber-500/20 border border-amber-500 text-amber-400'
-                    : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
-                }`}
-              >
-                {st.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Challenge Cards Grid */}
-        {filteredMatches.length === 0 ? (
-          <div className="p-12 text-center rounded-3xl bg-neutral-900 border border-neutral-800 shadow-xl">
-            <p className="text-sm text-neutral-400">
-              По выбранным фильтрам активных вызовов не найдено.
-            </p>
-            <button
-              onClick={() => {
-                 setSelectedSport('ALL');
-                 setDate('');
-                setSelectedStatus('ALL');
-              }}
-              className="mt-3 text-xs text-amber-400 font-bold hover:underline"
-            >
-              Сбросить фильтры
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {filteredMatches.map((match) => (
-              <ChallengeCard key={match.id} match={match} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Create Challenge Modal */}
-      {createModalOpen && (
-        <CreateChallengeModal
-          isOpen={createModalOpen}
-          onClose={() => setCreateModalOpen(false)}
-        />
-      )}
-    </div>
-  );
+function CatalogUnavailable() {
+  return <div className={panel} role="status">
+    <h2 className="text-xl font-bold">Реальные университетские вызовы пока недоступны</h2>
+    <p>Не удалось загрузить каталог из базы данных. Интерактивное демо доступно отдельно.</p>
+  </div>;
 }
 
-export default function ChallengesPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-neutral-950 p-12 text-white">Загрузка вызовов...</div>}>
-      <ChallengesContent />
-    </Suspense>
-  );
+async function Board({query}:{query:Promise<Query>}) {
+  const s=await query;const {db,access}=await viewer();
+  if(!db)return <CatalogUnavailable/>;
+  const dirs=await directories(db);if(!dirs)return <CatalogUnavailable/>;
+  const discipline=param(s,'sport'),uni=param(s,'university'),kind=param(s,'kind'),status=param(s,'status'),date=param(s,'date');
+  const page=Math.max(1,Math.min(10000,Number.parseInt(param(s,'page'),10)||1));
+  let request=db.from('challenge_feed').select('*').order('created_at',{ascending:false}).order('id');
+  if(dirs.disciplines.some(d=>d.id===discipline))request=request.eq('discipline',discipline);
+  if(dirs.universities.some(u=>u.id===uni)&&/^[\w-]+$/.test(uni))request=request.or(`creator.eq.${uni},target.eq.${uni},opponent.eq.${uni}`);
+  if(['OPEN','DIRECT'].includes(kind))request=request.eq('kind',kind);
+  if(['OPEN','ACCEPTED','EXPIRED','CANCELLED'].includes(status))request=request.eq('status',status);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(date))request=request.eq('proposed_date',date);
+  const {data,error}=await request.range((page-1)*24,page*24);
+  if(error||!data)return <CatalogUnavailable/>;
+  const pager=(n:number)=>`/challenges?${new URLSearchParams({sport:discipline,university:uni,kind,status,date,page:String(n)})}`;
+  return <>
+    <Notice value={param(s,'notice')}/>
+    <nav className="flex flex-wrap items-center gap-4">
+      {represents(access)&&<><Link className={button} href="/challenges/new">Создать вызов</Link>
+        <Link className={link} href="/university/dashboard">Кабинет университета</Link></>}
+      <Link className={link} href="/universities">Университеты</Link>
+    </nav>
+    <form className={`${panel} grid gap-3 sm:grid-cols-2 lg:grid-cols-3`} action="/challenges">
+      <label>Дисциплина<select className={input} name="sport" defaultValue={discipline}><option value="">Все дисциплины</option>
+        {dirs.disciplines.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>
+      <label>Университет<select className={input} name="university" defaultValue={uni}><option value="">Все университеты</option>
+        {dirs.universities.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></label>
+      <label>Тип<select className={input} name="kind" defaultValue={kind}><option value="">Все типы</option><option value="OPEN">Открытый</option><option value="DIRECT">Адресный</option></select></label>
+      <label>Статус<select className={input} name="status" defaultValue={status}><option value="">Все статусы</option>
+        {['OPEN','ACCEPTED','CANCELLED','EXPIRED'].map(x=><option key={x} value={x}>{labels[x]}</option>)}</select></label>
+      <label>Предложенная дата<input className={input} type="date" name="date" defaultValue={date}/></label>
+      <button className={button}>Показать</button>
+    </form>
+    {!data.length&&<p role="status">{discipline||uni||kind||status||date||page>1
+      ? <>По этим условиям вызовов нет. <Link className={link} href="/challenges">Сбросить фильтры</Link></>
+      : 'Каталог доступен. Пока ни один университет не опубликовал вызов.'}</p>}
+    <div className="grid gap-4 md:grid-cols-2">{(data as Challenge[]).slice(0,24).map(c=><article key={c.id} className={panel}>
+      <p>{entryName(dirs.disciplines,c.discipline)} · {labels[c.status]}</p>
+      <h2 className="break-words text-xl font-bold">{c.title}</h2>
+      <p>{entryName(dirs.universities,c.creator)} — {entryName(dirs.universities,c.opponent??c.target??'Любой университет')}</p>
+      <p className="break-words">{c.description}</p>
+      <p>Создан: {new Date(c.created_at).toLocaleDateString('ru-RU',{timeZone:'Asia/Tashkent'})}
+        {c.proposed_date&&` · Предложенная дата: ${c.proposed_date}`}{c.venue&&` · ${c.venue}`}</p>
+      {canAccept(access,c)&&<form action={acceptChallenge}><input type="hidden" name="id" value={c.id}/>
+        <button className={button}>{access?.admin||!access?.approval?'Принять вызов':'Предложить принятие'}</button></form>}
+    </article>)}</div>
+    <nav className="flex gap-4">{page>1&&<Link className={link} href={pager(page-1)}>Назад</Link>}
+      {data.length>24&&<Link className={link} href={pager(page+1)}>Далее</Link>}</nav>
+  </>;
+}
+export default function ChallengesPage({searchParams}:PageProps<'/challenges'>) {
+  return <Frame title="Университетские вызовы">
+    <p>Реальный каталог · здесь отображаются только опубликованные университетские вызовы.</p>
+    <nav aria-label="Демонстрационные разделы" className="flex flex-wrap gap-4">
+      <Link className={link} href="/demo/university-challenges">Попробовать интерактивное демо</Link>
+      <Link className={link} href="/demo/challenges">Демо-доска матчей</Link>
+    </nav>
+    <Board query={searchParams}/>
+  </Frame>;
 }

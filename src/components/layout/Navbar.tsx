@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useAppState();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isDemo = ['/challenges', '/leaderboards', '/demo', '/admin', '/venues'].some(
+  const isDemo = pathname === '/admin' || ['/leaderboards', '/demo', '/venues'].some(
     base => pathname === base || pathname.startsWith(`${base}/`)
   );
   const navLinks = [

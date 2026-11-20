@@ -17,6 +17,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
+    demo: true,
     success: true,
     count: list.length,
     data: list,
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json(
-      { success: true, message: 'Challenge broadcasted successfully', data: newMatch },
+      { success: true, demo: true, message: 'Demo challenge only; not published', data: newMatch },
       { status: 201 }
     );
   } catch (error) {

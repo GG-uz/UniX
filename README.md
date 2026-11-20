@@ -1,5 +1,8 @@
 # UniSport League — Web MVP
 
+**UniX 4.1:** [университетские вызовы, миграции, роли и локальные тесты](docs/university-challenges.md).
+Реальные вызовы — `/challenges`; демонстрационная доска — `/demo/challenges`.
+
 Inter-University Sports Matchmaking & Venue Booking Platform built with **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS**, and **Lucide Icons**.
 
 ---
